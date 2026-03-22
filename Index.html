@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>Yogesh Original Bird FullScreen</title>
+    <style>
+        body { 
+            margin: 0; 
+            padding: 0; 
+            overflow: hidden; 
+            background: #222; 
+            font-family: 'Arial Black', sans-serif; 
+            touch-action: manipulation; 
+        }
+        canvas { 
+            display: block; 
+            background: #70c5ce; 
+        }
+        #msg { 
+            color: gold; 
+            font-size: 30px; 
+            position: absolute; 
+            width: 100%; 
+            top: 40%; 
+            pointer-events: none; 
+            text-shadow: 2px 2px #000; 
+            z-index: 10; 
+            text-align: center;
+        }
+    </style>
+</head>
+<body onclick="handleClick()" ontouchstart="handleClick(event)">
+
+    <audio id="bgMusic" loop>
+        <source src="scam.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="msg">GAME MADE BY YOGESH<br><span style="font-size: 20px; color: white;">खेलने के लिए क्लिक करें</span></div>
+    <canvas id="c"></canvas>
+
+    <script>
+        // --- केवल ये 5 लाइनें जोड़ी हैं ऑफलाइन के लिए ---
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(err => console.log(err));
+        }
+        // -------------------------------------------
+
+        var canvas = document.getElementById("c");
+        var ctx = canvas.getContext("2d");
+        var music = document.getElementById("bgMusic");
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        var active = false;
+        var score = 0;
+        var birdY = canvas.height / 2;
+        var birdX = 60; 
+        var birdV = 0;
+        var gravity = 0.35;
+        var pipes = [];
+        var frame = 0;
+
+        function handleClick(e) {
+            if (e && e.type === 'touchstart') e.preventDefault();
+            if (!active) {
+                if(music) music.play(); 
+                active = true;
+                score = 0;
+                birdY = canvas.height / 2;
+                birdV = 0;
+                pipes = [];
+                frame = 0;
+                document.getElementById("msg").style.display = "none";
+                loop();
+            } else {
+                birdV = -7; 
+            }
+        }
+
+        function drawBird(x, y) {
+            // आपका ओरिजिनल चिड़िया डिज़ाइन
+            ctx.fillStyle = "#FFD700"; 
+            ctx.beginPath();
+            ctx.arc(x, y, 18, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = "black";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.fillStyle = "white";
+            ctx.beginPath();
+            ctx.arc(x + 8, y - 5, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = "black";
+            ctx.beginPath();
+            ctx.arc(x + 10, y - 5, 2, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = "orange";
+            ctx.beginPath();
+            ctx.moveTo(x + 15, y);
+            ctx.lineTo(x + 28, y + 5);
+            ctx.lineTo(x + 15, y + 10);
+            ctx.fill();
+
+            ctx.fillStyle = "white";
+            ctx.beginPath();
+            ctx.ellipse(x - 10, y, 10, 5, Math.PI/4, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = "black";
+            ctx.font = "bold 13px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText("YOGESH", x, y - 25);
+        }
+
+        function loop() {
+            if (!active) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            birdV += gravity;
+            birdY += birdV;
+
+            if (frame % 90 == 0) {
+                var gap = 170;
+                var h = Math.random() * (canvas.height - 300) + 50;
+                pipes.push({x: canvas.width, top: h, bot: canvas.height - h - gap, passed: false});
+            }
+
+            for (var i = pipes.length - 1; i >= 0; i--) {
+                var p = pipes[i];
+                p.x -= 3.5;
+
+                ctx.fillStyle = "#2ecc71";
+                ctx.fillRect(p.x, 0, 60, p.top); 
+                ctx.fillRect(p.x, canvas.height - p.bot, 60, p.bot); 
+                ctx.strokeStyle = "#1b5e20";
+                ctx.strokeRect(p.x, 0, 60, p.top);
+                ctx.strokeRect(p.x, canvas.height - p.bot, 60, p.bot);
+
+                if (!p.passed && p.x + 60 < birdX) {
+                    score++;
+                    p.passed = true;
+                }
+
+                if (birdX + 15 > p.x && birdX - 15 < p.x + 60) {
+                    if (birdY - 15 < p.top || birdY + 15 > canvas.height - p.bot) endGame();
+                }
+                if (p.x < -70) pipes.splice(i, 1);
+            }
+
+            if (birdY > canvas.height || birdY < 0) endGame();
+
+            drawBird(birdX, birdY);
+
+            ctx.fillStyle = "white";
+            ctx.font = "bold 45px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText(score, canvas.width / 2, 80);
+
+            frame++;
+            requestAnimationFrame(loop);
+        }
+
+        function endGame() {
+            active = false;
+            if(music) { music.pause(); music.currentTime = 0; }
+            var m = document.getElementById("msg");
+            m.innerHTML = "GAME OVER<br>SCORE: " + score + "<br><span style='font-size: 20px; color: white;'>फिर से खेलें</span>";
+            m.style.display = "block";
+        }
+    </script>
+</body>
+</html>
