@@ -3,178 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>Yogesh Original Bird FullScreen</title>
+    <title>YOGESH REALISTIC PRO</title>
     <style>
-        body { 
-            margin: 0; 
-            padding: 0; 
-            overflow: hidden; 
-            background: #222; 
-            font-family: 'Arial Black', sans-serif; 
-            touch-action: manipulation; 
-        }
-        canvas { 
-            display: block; 
-            background: #70c5ce; 
-        }
-        #msg { 
-            color: gold; 
-            font-size: 30px; 
-            position: absolute; 
-            width: 100%; 
-            top: 40%; 
-            pointer-events: none; 
-            text-shadow: 2px 2px #000; 
-            z-index: 10; 
-            text-align: center;
-        }
+        body { margin: 0; padding: 0; overflow: hidden; background: #000; font-family: Arial, sans-serif; touch-action: manipulation; }
+        canvas { display: block; background: #000; }
+        #neonName { position: absolute; top: 10px; left: 15px; font-size: 26px; font-weight: 900; color: #fff; text-shadow: 0 0 10px gold, 0 0 20px gold; z-index: 50; letter-spacing: 2px; }
+        #ui, #historyUI { position: absolute; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; }
+        .box { background: #111; padding: 25px; border: 2px solid gold; border-radius: 20px; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 0 20px rgba(255,215,0,0.2); }
+        input { width: 90%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid gold; background: #000; color: white; text-align: center; font-size: 16px; }
+        .btn { width: 100%; padding: 12px; margin: 6px 0; border-radius: 8px; border: none; font-weight: bold; font-size: 16px; cursor: pointer; color: black; }
+        #scoreDisplay { position: absolute; top: 60px; width: 100%; text-align: center; color: white; font-size: 50px; font-weight: bold; z-index: 10; display: none; text-shadow: 2px 2px #000; }
+        #songSelect { width: 100%; padding: 10px; margin-top: 10px; background: #222; color: gold; border: 1px solid #444; border-radius: 5px; }
     </style>
 </head>
-<body onclick="handleClick()" ontouchstart="handleClick(event)">
+<body>
 
-    <audio id="bgMusic" loop>
-        <source src="scam.mp3" type="audio/mpeg">
-    </audio>
+    <div id="neonName">YOGESH</div>
 
-    <div id="msg">GAME MADE BY YOGESH<br><span style="font-size: 20px; color: white;">खेलने के लिए क्लिक करें</span></div>
+    <div id="ui">
+        <div class="box">
+            <h2 id="msgTitle" style="color: gold; margin: 0 0 15px 0;">PREMIUM GAME</h2>
+            <input type="text" id="nameInput" value="YOGESH">
+            <button class="btn" style="background: #2ecc71;" onclick="startGame(0.24, 3.5, 210)">EASY</button>
+            <button class="btn" style="background: #f1c40f;" onclick="startGame(0.34, 5, 180)">HARD</button>
+            <button class="btn" style="background: #e74c3c;" onclick="startGame(0.48, 6.5, 150)">ULTRA</button>
+            <button class="btn" style="background: #555; color: white;" onclick="showHistory()">HISTORY</button>
+            
+            <select id="songSelect" onchange="changeSong()">
+                <option value="scam.mp3">🎵 Track 01</option>
+                <option value="song2.mp3">🎵 Track 02</option>
+                <option value="song3.mp3">🎵 Track 03</option>
+                <option value="song4.mp3">🎵 Track 04</option>
+                <option value="song5.mp3">🎵 Track 05</option>
+                <option value="song6.mp3">🎵 Track 06</option>
+                <option value="song7.mp3">🎵 Track 07</option>
+                <option value="song8.mp3">🎵 Track 08</option>
+                <option value="song9.mp3">🎵 Track 09</option>
+                <option value="song10.mp3">🎵 Track 10</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="historyUI" style="display:none;">
+        <div class="box">
+            <h2 style="color: gold;">HISTORY</h2>
+            <ul id="scoreList" style="text-align:left; color:gold; font-size:14px;"></ul>
+            <button class="btn" style="background: white;" onclick="hideHistory()">BACK</button>
+        </div>
+    </div>
+
+    <div id="scoreDisplay">0</div>
+    <audio id="bgMusic" loop><source id="musicSource" src="scam.mp3" type="audio/mpeg"></audio>
     <canvas id="c"></canvas>
 
     <script>
-        // --- केवल ये 5 लाइनें जोड़ी हैं ऑफलाइन के लिए ---
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(err => console.log(err));
-        }
-        // -------------------------------------------
-
         var canvas = document.getElementById("c");
         var ctx = canvas.getContext("2d");
         var music = document.getElementById("bgMusic");
+        var active = false, score = 0, birdY, birdX = 80, birdV = 0, pipes = [], frame = 0;
+        var full_name = "YOGESH", display_name = "", char_idx = 0, is_del = false;
+        var grav, speed, gap;
 
-        function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.onresize = resize; resize();
+
+        // टाइपिंग एनीमेशन
+        setInterval(() => {
+            if(!is_del) { display_name = full_name.substring(0, char_idx++); if(char_idx > full_name.length) is_del = true; }
+            else { display_name = full_name.substring(0, char_idx--); if(char_idx < 0) { is_del = false; char_idx = 0; } }
+        }, 200);
+
+        function startGame(g, s, gp) {
+            full_name = document.getElementById("nameInput").value.toUpperCase() || "YOGESH";
+            grav = g; speed = s; gap = gp;
+            document.getElementById("ui").style.display = "none";
+            document.getElementById("scoreDisplay").style.display = "block";
+            active = true; score = 0; birdY = canvas.height/2; birdV = 0; pipes = []; frame = 0;
+            music.play().catch(e => {}); loop();
         }
-        window.addEventListener('resize', resize);
-        resize();
 
-        var active = false;
-        var score = 0;
-        var birdY = canvas.height / 2;
-        var birdX = 60; 
-        var birdV = 0;
-        var gravity = 0.35;
-        var pipes = [];
-        var frame = 0;
-
-        function handleClick(e) {
-            if (e && e.type === 'touchstart') e.preventDefault();
-            if (!active) {
-                if(music) music.play(); 
-                active = true;
-                score = 0;
-                birdY = canvas.height / 2;
-                birdV = 0;
-                pipes = [];
-                frame = 0;
-                document.getElementById("msg").style.display = "none";
-                loop();
-            } else {
-                birdV = -7; 
-            }
+        function showHistory() {
+            document.getElementById("ui").style.display = "none";
+            document.getElementById("historyUI").style.display = "flex";
+            var history = JSON.parse(localStorage.getItem("yog_h")) || [];
+            var list = document.getElementById("scoreList");
+            list.innerHTML = history.map((s, i) => `<li>#${i+1} Score: ${s}</li>`).join('') || "<li>No scores</li>";
         }
+        function hideHistory() { document.getElementById("historyUI").style.display = "none"; document.getElementById("ui").style.display = "flex"; }
+
+        window.onmousedown = function() { if(active) birdV = -7; };
+        window.ontouchstart = function(e) { if(active) { birdV = -7; e.preventDefault(); } };
 
         function drawBird(x, y) {
-            // आपका ओरिजिनल चिड़िया डिज़ाइन
-            ctx.fillStyle = "#FFD700"; 
-            ctx.beginPath();
-            ctx.arc(x, y, 18, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.strokeStyle = "black";
-            ctx.lineWidth = 2;
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(birdV * 0.04); // गिरने पर चिड़िया झुकेगी
+
+            // Body
+            ctx.fillStyle = "#f1c40f"; ctx.beginPath(); ctx.ellipse(0, 0, 22, 18, 0, 0, Math.PI*2); ctx.fill();
+            ctx.strokeStyle = "#b8860b"; ctx.lineWidth = 2; ctx.stroke();
+
+            // Wing (Animated)
+            var wingMove = Math.sin(frame * 0.3) * 10;
+            ctx.fillStyle = "#ffd700"; ctx.beginPath(); ctx.ellipse(-10, wingMove, 12, 8, Math.PI/4, 0, Math.PI*2); ctx.fill();
             ctx.stroke();
 
-            ctx.fillStyle = "white";
-            ctx.beginPath();
-            ctx.arc(x + 8, y - 5, 5, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.fillStyle = "black";
-            ctx.beginPath();
-            ctx.arc(x + 10, y - 5, 2, 0, Math.PI * 2);
-            ctx.fill();
+            // Eye (Realistic)
+            ctx.fillStyle = "white"; ctx.beginPath(); ctx.arc(10, -6, 6, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = "black"; ctx.beginPath(); ctx.arc(12, -6, 2.5, 0, Math.PI*2); ctx.fill(); // पुतली
 
-            ctx.fillStyle = "orange";
-            ctx.beginPath();
-            ctx.moveTo(x + 15, y);
-            ctx.lineTo(x + 28, y + 5);
-            ctx.lineTo(x + 15, y + 10);
-            ctx.fill();
+            // Beak
+            ctx.fillStyle = "#e67e22"; ctx.beginPath(); ctx.moveTo(18, 0); ctx.lineTo(32, 4); ctx.lineTo(18, 10); ctx.fill();
 
-            ctx.fillStyle = "white";
-            ctx.beginPath();
-            ctx.ellipse(x - 10, y, 10, 5, Math.PI/4, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.fillStyle = "black";
-            ctx.font = "bold 13px Arial";
-            ctx.textAlign = "center";
-            ctx.fillText("YOGESH", x, y - 25);
+            ctx.restore();
+            
+            // Name Typing
+            ctx.fillStyle = "gold"; ctx.font = "bold 15px monospace"; ctx.textAlign = "center";
+            ctx.fillText(display_name + "_", x, y - 35);
         }
 
         function loop() {
-            if (!active) return;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if(!active) return;
+            ctx.fillStyle = "black"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            birdV += grav; birdY += birdV;
 
-            birdV += gravity;
-            birdY += birdV;
-
-            if (frame % 90 == 0) {
-                var gap = 170;
-                var h = Math.random() * (canvas.height - 300) + 50;
-                pipes.push({x: canvas.width, top: h, bot: canvas.height - h - gap, passed: false});
+            if(frame % 90 == 0) {
+                var h = Math.random() * (canvas.height - (gap + 150)) + 75;
+                pipes.push({x: canvas.width, t: h, p: false});
             }
 
-            for (var i = pipes.length - 1; i >= 0; i--) {
-                var p = pipes[i];
-                p.x -= 3.5;
-
-                ctx.fillStyle = "#2ecc71";
-                ctx.fillRect(p.x, 0, 60, p.top); 
-                ctx.fillRect(p.x, canvas.height - p.bot, 60, p.bot); 
-                ctx.strokeStyle = "#1b5e20";
-                ctx.strokeRect(p.x, 0, 60, p.top);
-                ctx.strokeRect(p.x, canvas.height - p.bot, 60, p.bot);
-
-                if (!p.passed && p.x + 60 < birdX) {
-                    score++;
-                    p.passed = true;
-                }
-
-                if (birdX + 15 > p.x && birdX - 15 < p.x + 60) {
-                    if (birdY - 15 < p.top || birdY + 15 > canvas.height - p.bot) endGame();
-                }
-                if (p.x < -70) pipes.splice(i, 1);
+            for(var i=pipes.length-1; i>=0; i--) {
+                var p = pipes[i]; p.x -= speed;
+                ctx.fillStyle = "#2ecc71"; ctx.fillRect(p.x, 0, 65, p.t); ctx.fillRect(p.x, p.t + gap, 65, canvas.height);
+                if(!p.p && p.x + 65 < birdX) { score++; p.p = true; document.getElementById("scoreDisplay").innerText = score; }
+                if(birdX+15 > p.x && birdX-15 < p.x+65 && (birdY-15 < p.t || birdY+15 > p.t+gap)) endGame();
+                if(p.x < -100) pipes.splice(i, 1);
             }
 
-            if (birdY > canvas.height || birdY < 0) endGame();
-
+            if(birdY > canvas.height || birdY < 0) endGame();
             drawBird(birdX, birdY);
-
-            ctx.fillStyle = "white";
-            ctx.font = "bold 45px Arial";
-            ctx.textAlign = "center";
-            ctx.fillText(score, canvas.width / 2, 80);
-
-            frame++;
-            requestAnimationFrame(loop);
+            frame++; requestAnimationFrame(loop);
         }
 
         function endGame() {
-            active = false;
-            if(music) { music.pause(); music.currentTime = 0; }
-            var m = document.getElementById("msg");
-            m.innerHTML = "GAME OVER<br>SCORE: " + score + "<br><span style='font-size: 20px; color: white;'>फिर से खेलें</span>";
-            m.style.display = "block";
+            active = false; music.pause();
+            var h = JSON.parse(localStorage.getItem("yog_h")) || []; h.unshift(score);
+            if(h.length > 10) h.pop(); localStorage.setItem("yog_h", JSON.stringify(h));
+            document.getElementById("ui").style.display = "flex";
+            document.getElementById("scoreDisplay").style.display = "none";
+            document.getElementById("msgTitle").innerText = "SCORE: " + score;
         }
+
+        function changeSong() { document.getElementById("musicSource").src = document.getElementById("songSelect").value; music.load(); }
     </script>
 </body>
 </html>
