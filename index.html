@@ -11,8 +11,7 @@
         #ui, #historyUI, #walletUI { position: absolute; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; }
         .box { background: #111; padding: 25px; border: 2px solid gold; border-radius: 20px; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 0 20px rgba(255,215,0,0.2); }
         input { width: 90%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid gold; background: #000; color: white; text-align: center; font-size: 16px; }
-        .btn { width: 100%; padding: 12px; margin: 6px 0; border-radius: 8px; border: none; font-weight: bold; font-size: 16px; cursor: pointer; color: black; transition: 0.2s; }
-        .btn:active { transform: scale(0.95); }
+        .btn { width: 100%; padding: 12px; margin: 6px 0; border-radius: 8px; border: none; font-weight: bold; font-size: 16px; cursor: pointer; color: black; }
         #scoreDisplay { position: absolute; top: 60px; width: 100%; text-align: center; color: white; font-size: 50px; font-weight: bold; z-index: 10; display: none; text-shadow: 2px 2px #000; }
         #songSelect { width: 100%; padding: 10px; margin-top: 10px; background: #222; color: gold; border: 1px solid #444; border-radius: 5px; }
         #ptsBadge { position: absolute; top: 15px; right: 15px; color: gold; font-weight: bold; z-index: 60; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 10px; border: 1px solid gold; }
@@ -34,12 +33,14 @@
             
             <button class="btn" style="background: #00ccff; border: 2px solid white;" onclick="payToPlay()">💰 ADD CASH (₹10-1000)</button>
             
+            <button class="btn" style="background: #25D366; color: white;" onclick="window.location.href='https://whatsapp.com/channel/0029VbCqsA82UPBAEPTMtg3c'">
+                💬 JOIN WHATSAPP CHANNEL
+            </button>
+
             <div style="display: flex; gap: 5px;">
                 <button class="btn" style="background: gold; flex: 1;" onclick="showWallet()">WALLET</button>
                 <button class="btn" style="background: white; flex: 1;" onclick="showHistory()">HISTORY</button>
             </div>
-
-            <button class="btn" style="background: #ff4444; color: white;" onclick="openSupport()">SUPPORT / HELP</button>
             
             <select id="songSelect" onchange="changeSong()">
                 <option value="scam.mp3">🎵 Track 01</option>
@@ -60,7 +61,6 @@
         <div class="box">
             <h2 style="color: gold;">WALLET</h2>
             <p>Total Points: <span id="totalPts" style="color:gold; font-size:20px;">0</span></p>
-            <p style="font-size:12px;">(100 Pts = ₹1 | Min Withdraw = ₹25)</p>
             <input type="text" id="upiInput" placeholder="Enter Your UPI ID">
             <button class="btn" style="background: #2ecc71;" onclick="sendWithdrawRequest()">WITHDRAW TO WHATSAPP</button>
             <button class="btn" style="background: white;" onclick="hideWallet()">BACK</button>
@@ -70,7 +70,7 @@
     <div id="historyUI" style="display:none;">
         <div class="box">
             <h2 style="color: gold;">HISTORY</h2>
-            <ul id="scoreList" style="text-align:left; color:gold; font-size:14px; max-height: 150px; overflow-y: auto;"></ul>
+            <ul id="scoreList" style="text-align:left; color:gold; font-size:14px; max-height:150px; overflow-y:auto;"></ul>
             <button class="btn" style="background: white;" onclick="hideHistory()">BACK</button>
         </div>
     </div>
@@ -87,32 +87,27 @@
         var full_name = "YOGESH", display_name = "", char_idx = 0, is_del = false;
         var grav, speed, gap, currentMode;
         var myPoints = parseInt(localStorage.getItem("ykj_pts")) || 0;
-        var myUpiId = "6375843097@fam"; // आपकी UPI ID
-        var adminWhatsapp = "916375843097"; // आपका व्हाट्सएप नंबर (91 के साथ)
+        var myUpiId = "6375843097@fam"; 
+        var adminWhatsapp = "916375843097"; 
 
         document.getElementById("userPts").innerText = myPoints;
 
         function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
         window.onresize = resize; resize();
 
-        // टाइपिंग एनीमेशन
         setInterval(() => {
             if(!is_del) { display_name = full_name.substring(0, char_idx++); if(char_idx > full_name.length) is_del = true; }
             else { display_name = full_name.substring(0, char_idx--); if(char_idx < 0) { is_del = false; char_idx = 0; } }
         }, 200);
 
-        // --- PAYMENT LOGIC (ADD CASH) ---
         function payToPlay() {
             let amount = prompt("कितने रुपये लोड करना चाहते हैं? (₹10 - ₹1000)", "10");
             if (amount === null || amount === "") return;
             let amt = parseFloat(amount);
             if (amt >= 10 && amt <= 1000) {
-                let upiUrl = `upi://pay?pa=${myUpiId}&pn=Yogesh_Game&am=${amt}&cu=INR`;
-                window.location.href = upiUrl;
+                window.location.href = `upi://pay?pa=${myUpiId}&pn=Yogesh_Game&am=${amt}&cu=INR`;
                 alert("पेमेंट के बाद स्क्रीनशॉट व्हाट्सएप पर भेजें!");
-            } else {
-                alert("कृपया ₹10 से ₹1000 के बीच की राशि डालें।");
-            }
+            } else { alert("₹10 से ₹1000 के बीच ही डालें।"); }
         }
 
         function startGame(g, s, gp, mode) {
@@ -138,13 +133,11 @@
 
         function sendWithdrawRequest() {
             let upi = document.getElementById("upiInput").value;
-            if (!upi.includes("@")) { alert("सही UPI ID डालें!"); return; }
-            if (myPoints < 2500) { alert("कम से कम ₹25 (2500 Pts) चाहिए!"); return; }
-            let msg = `*Y.K.J. WITHDRAW*%0AName: ${full_name}%0APoints: ${myPoints}%0AAmount: ₹${myPoints/100}%0AUPI: ${upi}`;
-            window.open(`https://wa.me/${adminWhatsapp}?text=${msg}`, '_blank');
+            if (!upi.includes("@")) { alert("UPI ID गलत है!"); return; }
+            if (myPoints < 2500) { alert("कम से कम 2500 Pts (₹25) चाहिए!"); return; }
+            window.open(`https://wa.me/${adminWhatsapp}?text=*WITHDRAW*%0AName: ${full_name}%0APoints: ${myPoints}%0AUPI: ${upi}`, '_blank');
         }
 
-        function openSupport() { window.location.href = "https://wa.me/916375843097?text=Hello%20Y.K.J.%20Game%20Support"; }
         function showWallet() { document.getElementById("ui").style.display="none"; document.getElementById("walletUI").style.display="flex"; document.getElementById("totalPts").innerText=myPoints; }
         function hideWallet() { document.getElementById("walletUI").style.display="none"; document.getElementById("ui").style.display="flex"; }
         function showHistory() { document.getElementById("ui").style.display = "none"; document.getElementById("historyUI").style.display = "flex"; var h = JSON.parse(localStorage.getItem("yog_h")) || []; document.getElementById("scoreList").innerHTML = h.map((s, i) => `<li>#${i+1} Score: ${s}</li>`).join('') || "<li>No scores</li>"; }
@@ -191,7 +184,7 @@
             document.getElementById("ui").style.display = "flex";
             document.getElementById("scoreDisplay").style.display = "none";
             document.getElementById("msgTitle").innerText = "SCORE: " + score;
-            if(earned > 0) alert("REWARD: " + earned + " Points Added!");
+            if(earned > 0) alert("WIN! " + earned + " Points Added!");
         }
 
         function changeSong() { document.getElementById("musicSource").src = document.getElementById("songSelect").value; music.load(); music.play(); }
