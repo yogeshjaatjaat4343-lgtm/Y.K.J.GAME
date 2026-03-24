@@ -8,26 +8,38 @@
         body { margin: 0; padding: 0; overflow: hidden; background: #000; font-family: Arial, sans-serif; touch-action: manipulation; }
         canvas { display: block; background: #000; }
         #neonName { position: absolute; top: 10px; left: 15px; font-size: 26px; font-weight: 900; color: #fff; text-shadow: 0 0 10px gold, 0 0 20px gold; z-index: 50; letter-spacing: 2px; }
-        #ui, #historyUI { position: absolute; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; }
+        #ui, #historyUI, #walletUI { position: absolute; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; }
         .box { background: #111; padding: 25px; border: 2px solid gold; border-radius: 20px; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 0 20px rgba(255,215,0,0.2); }
         input { width: 90%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid gold; background: #000; color: white; text-align: center; font-size: 16px; }
-        .btn { width: 100%; padding: 12px; margin: 6px 0; border-radius: 8px; border: none; font-weight: bold; font-size: 16px; cursor: pointer; color: black; }
+        .btn { width: 100%; padding: 12px; margin: 6px 0; border-radius: 8px; border: none; font-weight: bold; font-size: 16px; cursor: pointer; color: black; transition: 0.2s; }
+        .btn:active { transform: scale(0.95); }
         #scoreDisplay { position: absolute; top: 60px; width: 100%; text-align: center; color: white; font-size: 50px; font-weight: bold; z-index: 10; display: none; text-shadow: 2px 2px #000; }
         #songSelect { width: 100%; padding: 10px; margin-top: 10px; background: #222; color: gold; border: 1px solid #444; border-radius: 5px; }
+        #ptsBadge { position: absolute; top: 15px; right: 15px; color: gold; font-weight: bold; z-index: 60; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 10px; border: 1px solid gold; }
     </style>
 </head>
 <body>
 
     <div id="neonName">YOGESH</div>
+    <div id="ptsBadge">Pts: <span id="userPts">0</span></div>
 
     <div id="ui">
         <div class="box">
-            <h2 id="msgTitle" style="color: gold; margin: 0 0 15px 0;">PREMIUM GAME</h2>
+            <h2 id="msgTitle" style="color: gold; margin: 0 0 10px 0;">PREMIUM GAME</h2>
             <input type="text" id="nameInput" value="YOGESH">
-            <button class="btn" style="background: #2ecc71;" onclick="startGame(0.24, 3.5, 210)">EASY</button>
-            <button class="btn" style="background: #f1c40f;" onclick="startGame(0.34, 5, 180)">HARD</button>
-            <button class="btn" style="background: #e74c3c;" onclick="startGame(0.48, 6.5, 150)">ULTRA</button>
-            <button class="btn" style="background: #555; color: white;" onclick="showHistory()">HISTORY</button>
+            
+            <button class="btn" style="background: #2ecc71;" onclick="startGame(0.24, 3.5, 210, 'Easy')">EASY</button>
+            <button class="btn" style="background: #f1c40f;" onclick="startGame(0.34, 5, 180, 'Hard')">HARD</button>
+            <button class="btn" style="background: #e74c3c;" onclick="startGame(0.48, 6.5, 150, 'Ultra')">ULTRA</button>
+            
+            <button class="btn" style="background: #00ccff; border: 2px solid white;" onclick="payToPlay()">💰 ADD CASH (₹10-1000)</button>
+            
+            <div style="display: flex; gap: 5px;">
+                <button class="btn" style="background: gold; flex: 1;" onclick="showWallet()">WALLET</button>
+                <button class="btn" style="background: white; flex: 1;" onclick="showHistory()">HISTORY</button>
+            </div>
+
+            <button class="btn" style="background: #ff4444; color: white;" onclick="openSupport()">SUPPORT / HELP</button>
             
             <select id="songSelect" onchange="changeSong()">
                 <option value="scam.mp3">🎵 Track 01</option>
@@ -44,10 +56,21 @@
         </div>
     </div>
 
+    <div id="walletUI" style="display:none;">
+        <div class="box">
+            <h2 style="color: gold;">WALLET</h2>
+            <p>Total Points: <span id="totalPts" style="color:gold; font-size:20px;">0</span></p>
+            <p style="font-size:12px;">(100 Pts = ₹1 | Min Withdraw = ₹25)</p>
+            <input type="text" id="upiInput" placeholder="Enter Your UPI ID">
+            <button class="btn" style="background: #2ecc71;" onclick="sendWithdrawRequest()">WITHDRAW TO WHATSAPP</button>
+            <button class="btn" style="background: white;" onclick="hideWallet()">BACK</button>
+        </div>
+    </div>
+
     <div id="historyUI" style="display:none;">
         <div class="box">
             <h2 style="color: gold;">HISTORY</h2>
-            <ul id="scoreList" style="text-align:left; color:gold; font-size:14px;"></ul>
+            <ul id="scoreList" style="text-align:left; color:gold; font-size:14px; max-height: 150px; overflow-y: auto;"></ul>
             <button class="btn" style="background: white;" onclick="hideHistory()">BACK</button>
         </div>
     </div>
@@ -62,7 +85,12 @@
         var music = document.getElementById("bgMusic");
         var active = false, score = 0, birdY, birdX = 80, birdV = 0, pipes = [], frame = 0;
         var full_name = "YOGESH", display_name = "", char_idx = 0, is_del = false;
-        var grav, speed, gap;
+        var grav, speed, gap, currentMode;
+        var myPoints = parseInt(localStorage.getItem("ykj_pts")) || 0;
+        var myUpiId = "6375843097@fam"; // आपकी UPI ID
+        var adminWhatsapp = "916375843097"; // आपका व्हाट्सएप नंबर (91 के साथ)
+
+        document.getElementById("userPts").innerText = myPoints;
 
         function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
         window.onresize = resize; resize();
@@ -73,7 +101,22 @@
             else { display_name = full_name.substring(0, char_idx--); if(char_idx < 0) { is_del = false; char_idx = 0; } }
         }, 200);
 
-        function startGame(g, s, gp) {
+        // --- PAYMENT LOGIC (ADD CASH) ---
+        function payToPlay() {
+            let amount = prompt("कितने रुपये लोड करना चाहते हैं? (₹10 - ₹1000)", "10");
+            if (amount === null || amount === "") return;
+            let amt = parseFloat(amount);
+            if (amt >= 10 && amt <= 1000) {
+                let upiUrl = `upi://pay?pa=${myUpiId}&pn=Yogesh_Game&am=${amt}&cu=INR`;
+                window.location.href = upiUrl;
+                alert("पेमेंट के बाद स्क्रीनशॉट व्हाट्सएप पर भेजें!");
+            } else {
+                alert("कृपया ₹10 से ₹1000 के बीच की राशि डालें।");
+            }
+        }
+
+        function startGame(g, s, gp, mode) {
+            currentMode = mode;
             full_name = document.getElementById("nameInput").value.toUpperCase() || "YOGESH";
             grav = g; speed = s; gap = gp;
             document.getElementById("ui").style.display = "none";
@@ -82,42 +125,44 @@
             music.play().catch(e => {}); loop();
         }
 
-        function showHistory() {
-            document.getElementById("ui").style.display = "none";
-            document.getElementById("historyUI").style.display = "flex";
-            var history = JSON.parse(localStorage.getItem("yog_h")) || [];
-            var list = document.getElementById("scoreList");
-            list.innerHTML = history.map((s, i) => `<li>#${i+1} Score: ${s}</li>`).join('') || "<li>No scores</li>";
+        function calculatePoints(s) {
+            if ((currentMode === "Hard" || currentMode === "Ultra") && s >= 10) {
+                let p = Math.floor(s / 10) * 5;
+                myPoints += p;
+                localStorage.setItem("ykj_pts", myPoints);
+                document.getElementById("userPts").innerText = myPoints;
+                return p;
+            }
+            return 0;
         }
+
+        function sendWithdrawRequest() {
+            let upi = document.getElementById("upiInput").value;
+            if (!upi.includes("@")) { alert("सही UPI ID डालें!"); return; }
+            if (myPoints < 2500) { alert("कम से कम ₹25 (2500 Pts) चाहिए!"); return; }
+            let msg = `*Y.K.J. WITHDRAW*%0AName: ${full_name}%0APoints: ${myPoints}%0AAmount: ₹${myPoints/100}%0AUPI: ${upi}`;
+            window.open(`https://wa.me/${adminWhatsapp}?text=${msg}`, '_blank');
+        }
+
+        function openSupport() { window.location.href = "https://wa.me/916375843097?text=Hello%20Y.K.J.%20Game%20Support"; }
+        function showWallet() { document.getElementById("ui").style.display="none"; document.getElementById("walletUI").style.display="flex"; document.getElementById("totalPts").innerText=myPoints; }
+        function hideWallet() { document.getElementById("walletUI").style.display="none"; document.getElementById("ui").style.display="flex"; }
+        function showHistory() { document.getElementById("ui").style.display = "none"; document.getElementById("historyUI").style.display = "flex"; var h = JSON.parse(localStorage.getItem("yog_h")) || []; document.getElementById("scoreList").innerHTML = h.map((s, i) => `<li>#${i+1} Score: ${s}</li>`).join('') || "<li>No scores</li>"; }
         function hideHistory() { document.getElementById("historyUI").style.display = "none"; document.getElementById("ui").style.display = "flex"; }
 
         window.onmousedown = function() { if(active) birdV = -7; };
         window.ontouchstart = function(e) { if(active) { birdV = -7; e.preventDefault(); } };
 
         function drawBird(x, y) {
-            ctx.save();
-            ctx.translate(x, y);
-            ctx.rotate(birdV * 0.04); // गिरने पर चिड़िया झुकेगी
-
-            // Body
+            ctx.save(); ctx.translate(x, y); ctx.rotate(birdV * 0.04);
             ctx.fillStyle = "#f1c40f"; ctx.beginPath(); ctx.ellipse(0, 0, 22, 18, 0, 0, Math.PI*2); ctx.fill();
             ctx.strokeStyle = "#b8860b"; ctx.lineWidth = 2; ctx.stroke();
-
-            // Wing (Animated)
             var wingMove = Math.sin(frame * 0.3) * 10;
-            ctx.fillStyle = "#ffd700"; ctx.beginPath(); ctx.ellipse(-10, wingMove, 12, 8, Math.PI/4, 0, Math.PI*2); ctx.fill();
-            ctx.stroke();
-
-            // Eye (Realistic)
+            ctx.fillStyle = "#ffd700"; ctx.beginPath(); ctx.ellipse(-10, wingMove, 12, 8, Math.PI/4, 0, Math.PI*2); ctx.fill(); ctx.stroke();
             ctx.fillStyle = "white"; ctx.beginPath(); ctx.arc(10, -6, 6, 0, Math.PI*2); ctx.fill();
-            ctx.fillStyle = "black"; ctx.beginPath(); ctx.arc(12, -6, 2.5, 0, Math.PI*2); ctx.fill(); // पुतली
-
-            // Beak
+            ctx.fillStyle = "black"; ctx.beginPath(); ctx.arc(12, -6, 2.5, 0, Math.PI*2); ctx.fill();
             ctx.fillStyle = "#e67e22"; ctx.beginPath(); ctx.moveTo(18, 0); ctx.lineTo(32, 4); ctx.lineTo(18, 10); ctx.fill();
-
             ctx.restore();
-            
-            // Name Typing
             ctx.fillStyle = "gold"; ctx.font = "bold 15px monospace"; ctx.textAlign = "center";
             ctx.fillText(display_name + "_", x, y - 35);
         }
@@ -126,35 +171,30 @@
             if(!active) return;
             ctx.fillStyle = "black"; ctx.fillRect(0, 0, canvas.width, canvas.height);
             birdV += grav; birdY += birdV;
-
-            if(frame % 90 == 0) {
-                var h = Math.random() * (canvas.height - (gap + 150)) + 75;
-                pipes.push({x: canvas.width, t: h, p: false});
-            }
-
+            if(frame % 90 == 0) { var h = Math.random() * (canvas.height - (gap + 150)) + 75; pipes.push({x: canvas.width, t: h, p: false}); }
             for(var i=pipes.length-1; i>=0; i--) {
                 var p = pipes[i]; p.x -= speed;
-                ctx.fillStyle = "#2ecc71"; ctx.fillRect(p.x, 0, 65, p.t); ctx.fillRect(p.x, p.t + gap, 65, canvas.height);
+                ctx.fillStyle = (currentMode==="Ultra")?"#e74c3c":"#2ecc71"; ctx.fillRect(p.x, 0, 65, p.t); ctx.fillRect(p.x, p.t + gap, 65, canvas.height);
                 if(!p.p && p.x + 65 < birdX) { score++; p.p = true; document.getElementById("scoreDisplay").innerText = score; }
                 if(birdX+15 > p.x && birdX-15 < p.x+65 && (birdY-15 < p.t || birdY+15 > p.t+gap)) endGame();
                 if(p.x < -100) pipes.splice(i, 1);
             }
-
             if(birdY > canvas.height || birdY < 0) endGame();
-            drawBird(birdX, birdY);
-            frame++; requestAnimationFrame(loop);
+            drawBird(birdX, birdY); frame++; requestAnimationFrame(loop);
         }
 
         function endGame() {
             active = false; music.pause();
-            var h = JSON.parse(localStorage.getItem("yog_h")) || []; h.unshift(score);
+            let earned = calculatePoints(score);
+            var h = JSON.parse(localStorage.getItem("yog_h")) || []; h.unshift(score + " ("+currentMode+")");
             if(h.length > 10) h.pop(); localStorage.setItem("yog_h", JSON.stringify(h));
             document.getElementById("ui").style.display = "flex";
             document.getElementById("scoreDisplay").style.display = "none";
             document.getElementById("msgTitle").innerText = "SCORE: " + score;
+            if(earned > 0) alert("REWARD: " + earned + " Points Added!");
         }
 
-        function changeSong() { document.getElementById("musicSource").src = document.getElementById("songSelect").value; music.load(); }
+        function changeSong() { document.getElementById("musicSource").src = document.getElementById("songSelect").value; music.load(); music.play(); }
     </script>
 </body>
 </html>
