@@ -3,75 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>YOGESH REALISTIC PRO</title>
+    <title>Y.K.J. GAME PRO - ULTIMATE</title>
+    <script src="https://www.appcreator24.com/app.js"></script>
     <style>
-        body { margin: 0; padding: 0; overflow: hidden; background: #000; font-family: Arial, sans-serif; touch-action: manipulation; }
-        canvas { display: block; background: #000; }
-        #neonName { position: absolute; top: 10px; left: 15px; font-size: 26px; font-weight: 900; color: #fff; text-shadow: 0 0 10px gold, 0 0 20px gold; z-index: 50; letter-spacing: 2px; }
-        #ui, #historyUI, #walletUI { position: absolute; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; }
-        .box { background: #111; padding: 25px; border: 2px solid gold; border-radius: 20px; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 0 20px rgba(255,215,0,0.2); }
-        input { width: 90%; padding: 12px; margin-bottom: 15px; border-radius: 8px; border: 1px solid gold; background: #000; color: white; text-align: center; font-size: 16px; }
-        .btn { width: 100%; padding: 12px; margin: 6px 0; border-radius: 8px; border: none; font-weight: bold; font-size: 16px; cursor: pointer; color: black; }
-        #scoreDisplay { position: absolute; top: 60px; width: 100%; text-align: center; color: white; font-size: 50px; font-weight: bold; z-index: 10; display: none; text-shadow: 2px 2px #000; }
-        #songSelect { width: 100%; padding: 10px; margin-top: 10px; background: #222; color: gold; border: 1px solid #444; border-radius: 5px; }
-        #ptsBadge { position: absolute; top: 15px; right: 15px; color: gold; font-weight: bold; z-index: 60; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 10px; border: 1px solid gold; }
+        body { margin: 0; padding: 0; overflow: hidden; background: #000; font-family: Arial, sans-serif; touch-action: manipulation; color: white; -webkit-tap-highlight-color: transparent; }
+        canvas { display: block; background: #000; z-index: 1; }
+        #neonName { position: absolute; top: 10px; left: 15px; font-size: 22px; font-weight: 900; color: #fff; text-shadow: 0 0 10px gold, 0 0 20px gold; z-index: 200; pointer-events: none; }
+        
+        /* Fixed UI Layers */
+        .overlay-ui { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 500; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow-y: auto; }
+        .box { background: #111; padding: 20px; border: 2px solid gold; border-radius: 20px; width: 85%; max-width: 320px; text-align: center; box-shadow: 0 0 20px gold; margin: auto; position: relative; }
+        
+        .btn { width: 100%; padding: 12px; margin: 8px 0; border-radius: 10px; border: none; font-weight: bold; font-size: 14px; cursor: pointer; color: black; display: block; }
+        .btn:active { transform: scale(0.95); opacity: 0.8; }
+        
+        input { width: 90%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: 1px solid gold; background: #000; color: white; text-align: center; }
+        
+        #ptsBadge { position: absolute; top: 15px; right: 15px; color: gold; font-weight: bold; z-index: 200; background: rgba(0,0,0,0.7); padding: 5px 12px; border-radius: 10px; border: 1px solid gold; text-align: right; pointer-events: none; }
+        #scoreDisplay { position: absolute; top: 70px; width: 100%; text-align: center; font-size: 60px; font-weight: bold; z-index: 100; display: none; color: gold; text-shadow: 3px 3px #000; pointer-events: none; }
+        
+        .scratch-canvas { background: #666; cursor: crosshair; border-radius: 10px; border: 2px solid #444; touch-action: none; }
+        #welcomeBanner { position: absolute; top: 40%; width: 100%; text-align: center; font-size: 35px; font-weight: 900; color: gold; text-shadow: 0 0 20px orange; z-index: 1000; display: none; pointer-events: none; }
     </style>
 </head>
 <body>
 
-    <div id="neonName">YOGESH</div>
-    <div id="ptsBadge">Pts: <span id="userPts">0</span></div>
+    <div id="welcomeBanner">WELCOME TO<br>Y.K.J. GAME</div>
+    <div id="neonName">LOADING...</div>
+    <div id="ptsBadge">
+        Pts: <span id="userPts">0</span><br>
+        <span id="moneyInfo" style="font-size: 11px; color: #2ecc71;">₹0.00</span>
+    </div>
 
-    <div id="ui">
+    <div id="ui" class="overlay-ui">
         <div class="box">
-            <h2 id="msgTitle" style="color: gold; margin: 0 0 10px 0;">PREMIUM GAME</h2>
-            <input type="text" id="nameInput" value="YOGESH">
+            <h2 id="greetUser" style="color: gold; margin: 0 0 10px 0; font-size: 20px;">HELLO PLAYER</h2>
+            <p id="userEmailTag" style="font-size: 10px; color: #00ccff; margin-bottom: 15px;">Connecting...</p>
             
-            <button class="btn" style="background: #2ecc71;" onclick="startGame(0.24, 3.5, 210, 'Easy')">EASY</button>
-            <button class="btn" style="background: #f1c40f;" onclick="startGame(0.34, 5, 180, 'Hard')">HARD</button>
-            <button class="btn" style="background: #e74c3c;" onclick="startGame(0.48, 6.5, 150, 'Ultra')">ULTRA</button>
-            
-            <button class="btn" style="background: #00ccff; border: 2px solid white;" onclick="payToPlay()">💰 ADD CASH (₹10-1000)</button>
-            
-            <button class="btn" style="background: #25D366; color: white;" onclick="window.location.href='https://whatsapp.com/channel/0029VbCqsA82UPBAEPTMtg3c'">
-                💬 JOIN WHATSAPP CHANNEL
-            </button>
-
-            <div style="display: flex; gap: 5px;">
-                <button class="btn" style="background: gold; flex: 1;" onclick="showWallet()">WALLET</button>
-                <button class="btn" style="background: white; flex: 1;" onclick="showHistory()">HISTORY</button>
+            <div id="tournamentBox" style="display: none; margin-bottom: 10px;">
+                <button class="btn" style="background: linear-gradient(to right, #ff8c00, #ff0080); color: white; border: 2px solid white;" onclick="startTournament()">🏆 EVENING BLAST (LIVE)</button>
             </div>
+
+            <button class="btn" style="background: #a29bfe;" onclick="claimDailyBonus()">🎁 DAILY BONUS (1-100 Pts)</button>
             
-            <select id="songSelect" onchange="changeSong()">
+            <button class="btn" style="background: #2ecc71;" onclick="startGame(0.24, 3.5, 210, 'Easy')">EASY (PRACTICE)</button>
+            <button class="btn" style="background: #f1c40f;" onclick="startGame(0.34, 5, 180, 'Hard')">HARD (EARN)</button>
+            <button class="btn" style="background: #e74c3c; color: white;" onclick="startGame(0.48, 6.5, 150, 'Ultra')">ULTRA (EARN)</button>
+            
+            <div style="display: flex; gap: 8px; margin: 5px 0;">
+                <button class="btn" style="background: gold; flex: 1;" onclick="showSpin()">🎡 SPIN</button>
+                <button class="btn" style="background: #ff7675; flex: 1;" onclick="showScratch()">🧧 SCRATCH</button>
+            </div>
+
+            <button class="btn" style="background: #55efc4;" onclick="showTask()">📋 TASK WALL (+250 Pts)</button>
+            
+            <div style="display: flex; gap: 8px;">
+                <button class="btn" style="background: #0984e3; color: white; flex: 1;" onclick="showShop()">🛒 SHOP</button>
+                <button class="btn" style="background: #6c5ce7; color: white; flex: 1;" onclick="showTeam()">👥 TEAMS</button>
+            </div>
+
+            <div style="display: flex; gap: 8px;">
+                <button class="btn" style="background: white; flex: 1;" onclick="showWallet()">WALLET</button>
+                <button class="btn" style="background: #555; color: white; flex: 1;" onclick="showHistory()">HISTORY</button>
+            </div>
+
+            <select id="songSelect" style="width:100%; margin-top:10px; padding: 8px; background:#222; color:gold; border:1px solid gold; border-radius: 8px;" onchange="changeSong()">
                 <option value="scam.mp3">🎵 Track 01</option>
                 <option value="song2.mp3">🎵 Track 02</option>
-                <option value="song3.mp3">🎵 Track 03</option>
-                <option value="song4.mp3">🎵 Track 04</option>
-                <option value="song5.mp3">🎵 Track 05</option>
-                <option value="song6.mp3">🎵 Track 06</option>
-                <option value="song7.mp3">🎵 Track 07</option>
-                <option value="song8.mp3">🎵 Track 08</option>
-                <option value="song9.mp3">🎵 Track 09</option>
-                <option value="song10.mp3">🎵 Track 10</option>
+                <option value="song3.mp3">song3
+                  </option>
+                <option value="song4.mp3">song4
+                  </option>
+                <option value="song5.mp3">song5
+                  </option>
+                <option value="song6.mp3">song6
+                  </option>
+                <option value="song7.mp3">song7
+                    </option>
+                <option value="song8.mp3">song8
+                    </option>
+                <option value="song9.mp3">song9
+                    </option>
+                <option value="song10.mp3">song YOGESH
+                    </option>
+                
             </select>
         </div>
     </div>
 
-    <div id="walletUI" style="display:none;">
+    <div id="scratchUI" class="overlay-ui" style="display:none;">
         <div class="box">
-            <h2 style="color: gold;">WALLET</h2>
-            <p>Total Points: <span id="totalPts" style="color:gold; font-size:20px;">0</span></p>
-            <input type="text" id="upiInput" placeholder="Enter Your UPI ID">
-            <button class="btn" style="background: #2ecc71;" onclick="sendWithdrawRequest()">WITHDRAW TO WHATSAPP</button>
-            <button class="btn" style="background: white;" onclick="hideWallet()">BACK</button>
+            <h2 style="color: gold;">SCRATCH & WIN</h2>
+            <canvas id="scratchCanvas" width="220" height="120" class="scratch-canvas"></canvas>
+            <p id="scratchMsg" style="color: cyan; font-weight: bold; margin: 10px 0;"></p>
+            <button class="btn" style="background: white;" onclick="hideAllPanels()">BACK</button>
         </div>
     </div>
 
-    <div id="historyUI" style="display:none;">
+    <div id="walletUI" class="overlay-ui" style="display:none;">
         <div class="box">
-            <h2 style="color: gold;">HISTORY</h2>
-            <ul id="scoreList" style="text-align:left; color:gold; font-size:14px; max-height:150px; overflow-y:auto;"></ul>
-            <button class="btn" style="background: white;" onclick="hideHistory()">BACK</button>
+            <h2 style="color: gold;">WALLET</h2>
+            <p>100 Pts = ₹1 | 1000 Pts = ₹10</p>
+            <p style="font-size: 18px;">Balance: ₹<span id="cashVal">0.00</span></p>
+            <input type="text" id="upiInput" placeholder="Enter UPI ID">
+            <button class="btn" style="background: #2ecc71;" onclick="sendWithdrawRequest()">WITHDRAW NOW</button>
+            <button class="btn" style="background: white;" onclick="hideAllPanels()">BACK</button>
+        </div>
+    </div>
+
+    <div id="taskUI" class="overlay-ui" style="display:none;">
+        <div class="box">
+            <h2 style="color: gold;">TASKS</h2>
+            <button class="btn" style="background:#dc2743; color:white;" onclick="doVerifiedTask('insta', 100, 'https://instagram.com/y.k.j.game')">Follow Instagram</button>
+            <button class="btn" style="background:#25D366; color:white;" onclick="doVerifiedTask('wa', 150, 'https://whatsapp.com/channel/0029VbCqsA82UPBAEPTMtg3c')">Join WhatsApp</button>
+            <button class="btn" style="background:white;" onclick="hideAllPanels()">BACK</button>
         </div>
     </div>
 
@@ -80,114 +125,182 @@
     <canvas id="c"></canvas>
 
     <script>
-        var canvas = document.getElementById("c");
-        var ctx = canvas.getContext("2d");
-        var music = document.getElementById("bgMusic");
+        // --- Core Variables ---
+        var canvas = document.getElementById("c"), ctx = canvas.getContext("2d"), music = document.getElementById("bgMusic");
         var active = false, score = 0, birdY, birdX = 80, birdV = 0, pipes = [], frame = 0;
-        var full_name = "YOGESH", display_name = "", char_idx = 0, is_del = false;
-        var grav, speed, gap, currentMode;
         var myPoints = parseInt(localStorage.getItem("ykj_pts")) || 0;
-        var myUpiId = "6375843097@fam"; 
-        var adminWhatsapp = "916375843097"; 
+        var userName = "YOGESH", userEmail = "Guest";
+        var grav, speed, gap, currentMode, hasExtraLife = false;
 
-        document.getElementById("userPts").innerText = myPoints;
+        // Sounds
+        const pointSound = new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3');
+        const bombSound = new Audio('https://www.soundjay.com/explosion/sounds/explosion-01.mp3');
+
+        // --- Initialization ---
+        function initApp() {
+            if (typeof AppCreator24 !== 'undefined') {
+                userEmail = AppCreator24.getUserEmail() || "Guest";
+                userName = userEmail.split('@')[0].toUpperCase();
+                document.getElementById("userEmailTag").innerText = "Account: " + userEmail;
+            }
+            document.getElementById("neonName").innerText = userName;
+            document.getElementById("greetUser").innerText = "WELCOME " + userName;
+            updatePts();
+            resize();
+        }
+        window.onload = initApp;
 
         function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-        window.onresize = resize; resize();
+        window.onresize = resize;
 
-        setInterval(() => {
-            if(!is_del) { display_name = full_name.substring(0, char_idx++); if(char_idx > full_name.length) is_del = true; }
-            else { display_name = full_name.substring(0, char_idx--); if(char_idx < 0) { is_del = false; char_idx = 0; } }
-        }, 200);
-
-        function payToPlay() {
-            let amount = prompt("कितने रुपये लोड करना चाहते हैं? (₹10 - ₹1000)", "10");
-            if (amount === null || amount === "") return;
-            let amt = parseFloat(amount);
-            if (amt >= 10 && amt <= 1000) {
-                window.location.href = `upi://pay?pa=${myUpiId}&pn=Yogesh_Game&am=${amt}&cu=INR`;
-                alert("पेमेंट के बाद स्क्रीनशॉट व्हाट्सएप पर भेजें!");
-            } else { alert("₹10 से ₹1000 के बीच ही डालें।"); }
+        // --- Click Logic & Navigation ---
+        function hideAllPanels() {
+            const panels = ['ui', 'scratchUI', 'walletUI', 'taskUI'];
+            panels.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.style.display = 'none';
+            });
+            document.getElementById('ui').style.display = 'flex';
         }
 
-        function startGame(g, s, gp, mode) {
-            currentMode = mode;
-            full_name = document.getElementById("nameInput").value.toUpperCase() || "YOGESH";
-            grav = g; speed = s; gap = gp;
-            document.getElementById("ui").style.display = "none";
-            document.getElementById("scoreDisplay").style.display = "block";
-            active = true; score = 0; birdY = canvas.height/2; birdV = 0; pipes = []; frame = 0;
-            music.play().catch(e => {}); loop();
+        function claimDailyBonus() {
+            let last = localStorage.getItem("lastDaily"), today = new Date().toDateString();
+            if(last === today) { alert("Already claimed today!"); return; }
+            let win = Math.floor(Math.random() * 100) + 1;
+            myPoints += win; localStorage.setItem("lastDaily", today); updatePts();
+            alert("🎁 Bonus: +" + win + " Pts!");
         }
 
-        function calculatePoints(s) {
-            if ((currentMode === "Hard" || currentMode === "Ultra") && s >= 10) {
-                let p = Math.floor(s / 10) * 5;
-                myPoints += p;
-                localStorage.setItem("ykj_pts", myPoints);
-                document.getElementById("userPts").innerText = myPoints;
-                return p;
+        // --- Scratch System Fixed ---
+        const sCanvas = document.getElementById("scratchCanvas"), sCtx = sCanvas.getContext("2d");
+        function showScratch() {
+            hideAllPanels(); document.getElementById('ui').style.display = 'none';
+            document.getElementById('scratchUI').style.display = 'flex';
+            sCtx.globalCompositeOperation = 'source-over';
+            sCtx.fillStyle = '#999'; sCtx.fillRect(0,0,220,120);
+            sCtx.globalCompositeOperation = 'destination-out';
+            document.getElementById("scratchMsg").innerText = "Scratch here!";
+        }
+
+        function scratchHandler(e) {
+            e.preventDefault();
+            let rect = sCanvas.getBoundingClientRect();
+            let x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+            let y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+            sCtx.beginPath(); sCtx.arc(x, y, 15, 0, Math.PI*2); sCtx.fill();
+            if(Math.random() < 0.01) {
+                let last = localStorage.getItem("lastScr"), today = new Date().toDateString();
+                if(last !== today) {
+                    let win = 25; myPoints += win; localStorage.setItem("lastScr", today); updatePts();
+                    document.getElementById("scratchMsg").innerText = "WIN: " + win + " PTS!";
+                }
             }
-            return 0;
+        }
+        sCanvas.addEventListener("mousemove", scratchHandler);
+        sCanvas.addEventListener("touchmove", scratchHandler);
+
+        // --- Game Mechanics ---
+        function startGame(g, s, gp, mode) {
+            currentMode = mode; grav = g; speed = s; gap = gp;
+            document.getElementById('ui').style.display = 'none';
+            document.getElementById("welcomeBanner").style.display = "block";
+            
+            setTimeout(() => {
+                document.getElementById("welcomeBanner").style.display = "none";
+                document.getElementById("scoreDisplay").style.display = "block";
+                active = true; score = 0; hasExtraLife = true; birdY = canvas.height/2; birdV = 0; pipes = []; frame = 0;
+                music.play().catch(()=>{}); loop();
+            }, 1200);
         }
 
-        function sendWithdrawRequest() {
-            let upi = document.getElementById("upiInput").value;
-            if (!upi.includes("@")) { alert("UPI ID गलत है!"); return; }
-            if (myPoints < 2500) { alert("कम से कम 2500 Pts (₹25) चाहिए!"); return; }
-            window.open(`https://wa.me/${adminWhatsapp}?text=*WITHDRAW*%0AName: ${full_name}%0APoints: ${myPoints}%0AUPI: ${upi}`, '_blank');
-        }
-
-        function showWallet() { document.getElementById("ui").style.display="none"; document.getElementById("walletUI").style.display="flex"; document.getElementById("totalPts").innerText=myPoints; }
-        function hideWallet() { document.getElementById("walletUI").style.display="none"; document.getElementById("ui").style.display="flex"; }
-        function showHistory() { document.getElementById("ui").style.display = "none"; document.getElementById("historyUI").style.display = "flex"; var h = JSON.parse(localStorage.getItem("yog_h")) || []; document.getElementById("scoreList").innerHTML = h.map((s, i) => `<li>#${i+1} Score: ${s}</li>`).join('') || "<li>No scores</li>"; }
-        function hideHistory() { document.getElementById("historyUI").style.display = "none"; document.getElementById("ui").style.display = "flex"; }
-
-        window.onmousedown = function() { if(active) birdV = -7; };
-        window.ontouchstart = function(e) { if(active) { birdV = -7; e.preventDefault(); } };
-
-        function drawBird(x, y) {
-            ctx.save(); ctx.translate(x, y); ctx.rotate(birdV * 0.04);
-            ctx.fillStyle = "#f1c40f"; ctx.beginPath(); ctx.ellipse(0, 0, 22, 18, 0, 0, Math.PI*2); ctx.fill();
-            ctx.strokeStyle = "#b8860b"; ctx.lineWidth = 2; ctx.stroke();
-            var wingMove = Math.sin(frame * 0.3) * 10;
-            ctx.fillStyle = "#ffd700"; ctx.beginPath(); ctx.ellipse(-10, wingMove, 12, 8, Math.PI/4, 0, Math.PI*2); ctx.fill(); ctx.stroke();
-            ctx.fillStyle = "white"; ctx.beginPath(); ctx.arc(10, -6, 6, 0, Math.PI*2); ctx.fill();
-            ctx.fillStyle = "black"; ctx.beginPath(); ctx.arc(12, -6, 2.5, 0, Math.PI*2); ctx.fill();
-            ctx.fillStyle = "#e67e22"; ctx.beginPath(); ctx.moveTo(18, 0); ctx.lineTo(32, 4); ctx.lineTo(18, 10); ctx.fill();
-            ctx.restore();
-            ctx.fillStyle = "gold"; ctx.font = "bold 15px monospace"; ctx.textAlign = "center";
-            ctx.fillText(display_name + "_", x, y - 35);
+        function endGame() {
+            if(hasExtraLife && myPoints >= 50) {
+                if(confirm("Extra Life? Use 50 Pts to continue once!")) {
+                    myPoints -= 50; updatePts(); hasExtraLife = false; birdY -= 80; birdV = 0; return;
+                }
+            }
+            active = false; music.pause();
+            if(score >= 100) bombSound.play();
+            
+            let earned = (currentMode === 'Easy') ? 0 : (score >= 30 ? 20 : 5);
+            myPoints += earned; updatePts();
+            alert("GAME OVER! Score: " + score);
+            document.getElementById("scoreDisplay").style.display = "none";
+            document.getElementById('ui').style.display = 'flex';
         }
 
         function loop() {
             if(!active) return;
             ctx.fillStyle = "black"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
             birdV += grav; birdY += birdV;
-            if(frame % 90 == 0) { var h = Math.random() * (canvas.height - (gap + 150)) + 75; pipes.push({x: canvas.width, t: h, p: false}); }
+            
+            if(frame % 90 == 0) pipes.push({x: canvas.width, t: Math.random()*(canvas.height-(gap+150))+75, p: false});
+            
             for(var i=pipes.length-1; i>=0; i--) {
                 var p = pipes[i]; p.x -= speed;
-                ctx.fillStyle = (currentMode==="Ultra")?"#e74c3c":"#2ecc71"; ctx.fillRect(p.x, 0, 65, p.t); ctx.fillRect(p.x, p.t + gap, 65, canvas.height);
-                if(!p.p && p.x + 65 < birdX) { score++; p.p = true; document.getElementById("scoreDisplay").innerText = score; }
+                ctx.fillStyle = "#2ecc71";
+                ctx.fillRect(p.x, 0, 65, p.t);
+                ctx.fillRect(p.x, p.t + gap, 65, canvas.height);
+                
+                if(!p.p && p.x + 65 < birdX) { 
+                    score++; p.p = true; pointSound.play();
+                    document.getElementById("scoreDisplay").innerText = score;
+                }
                 if(birdX+15 > p.x && birdX-15 < p.x+65 && (birdY-15 < p.t || birdY+15 > p.t+gap)) endGame();
                 if(p.x < -100) pipes.splice(i, 1);
             }
+            
             if(birdY > canvas.height || birdY < 0) endGame();
-            drawBird(birdX, birdY); frame++; requestAnimationFrame(loop);
+            drawBird(birdX, birdY);
+            frame++; requestAnimationFrame(loop);
         }
 
-        function endGame() {
-            active = false; music.pause();
-            let earned = calculatePoints(score);
-            var h = JSON.parse(localStorage.getItem("yog_h")) || []; h.unshift(score + " ("+currentMode+")");
-            if(h.length > 10) h.pop(); localStorage.setItem("yog_h", JSON.stringify(h));
-            document.getElementById("ui").style.display = "flex";
-            document.getElementById("scoreDisplay").style.display = "none";
-            document.getElementById("msgTitle").innerText = "SCORE: " + score;
-            if(earned > 0) alert("WIN! " + earned + " Points Added!");
+        function drawBird(x, y) {
+            ctx.save(); ctx.translate(x, y); ctx.rotate(birdV * 0.04);
+            ctx.fillStyle = "#f1c40f"; ctx.beginPath(); ctx.ellipse(0, 0, 22, 18, 0, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = "white"; ctx.beginPath(); ctx.arc(10, -6, 6, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = "black"; ctx.beginPath(); ctx.arc(12, -6, 2.5, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = "#e67e22"; ctx.beginPath(); ctx.moveTo(18, 0); ctx.lineTo(32, 4); ctx.lineTo(18, 10); ctx.fill();
+            ctx.restore();
+            ctx.fillStyle = "gold"; ctx.font = "bold 14px Arial"; ctx.textAlign = "center";
+            ctx.fillText(userName, x, y - 35);
         }
 
-        function changeSong() { document.getElementById("musicSource").src = document.getElementById("songSelect").value; music.load(); music.play(); }
+        function updatePts() {
+            localStorage.setItem("ykj_pts", myPoints);
+            document.getElementById("userPts").innerText = myPoints;
+            let inr = (myPoints / 100).toFixed(2);
+            document.getElementById("moneyInfo").innerText = "₹" + inr;
+            document.getElementById("cashVal").innerText = inr;
+        }
+
+        function doVerifiedTask(id, pts, url) {
+            window.open(url);
+            setTimeout(() => {
+                if(confirm("Confirm: Task Done?")) {
+                    myPoints += pts; updatePts(); alert("Pts Added!");
+                }
+            }, 3000);
+        }
+
+        // --- Input Events ---
+        window.onmousedown = function(e) { 
+            if(active) { birdV = -7; } 
+        };
+        window.ontouchstart = function(e) { 
+            if(active) { birdV = -7; e.preventDefault(); } 
+        };
+
+        // --- Navigation Placeholder Stubs ---
+        function showWallet() { hideAllPanels(); document.getElementById('ui').style.display='none'; document.getElementById('walletUI').style.display='flex'; }
+        function showTask() { hideAllPanels(); document.getElementById('ui').style.display='none'; document.getElementById('taskUI').style.display='flex'; }
+        function showShop() { alert("Shop opening soon!"); }
+        function showTeam() { alert("Teams opening soon!"); }
+        function showSpin() { alert("Spin available tomorrow!"); }
+        function showHistory() { alert("History updated!"); }
+        function changeSong() { musicSource.src = songSelect.value; music.load(); music.play(); }
+
     </script>
 </body>
 </html>
