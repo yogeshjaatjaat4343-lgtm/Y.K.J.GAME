@@ -25,7 +25,7 @@
     </style>
 </head>
 <body>
-
+</div>
     <div id="neonName">LOADING...</div>
     <div id="ptsBadge">Pts: <span id="userPts">0</span><br><span style="font-size:10px; color:#00ff00;">(₹<span id="ptsToCash">0.00</span>)</span></div>
 
@@ -57,6 +57,10 @@
             <button class="btn" style="background: #fdcb6e;" onclick="showShop()">🛒 ITEM SHOP</button>
              <button class="btn" style="background: #2ecc71; color: white;" onclick="addMoney()">💰 ADD MONEY (₹30 - ₹500)</button>
             <button class="btn" style="background: #25D366; color: white;" onclick="window.location.href='https://whatsapp.com/channel/0029VbCqsA82UPBAEPTMtg3c'">💬 JOIN WHATSAPP</button>
+            <div style="margin: 10px 0; padding: 10px; background: #222; border: 1px solid gold; border-radius: 10px;">
+    <input type="text" id="promoCode" placeholder="ENTER CODE" style="width: 80%; margin-bottom: 5px;">
+    <button class="btn" style="background: gold; color: black; padding: 5px;" onclick="applyCode()">APPLY PROMO</button>
+</div>
             <button class="btn" style="background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #bc1888); color: white;" onclick="window.location.href='https://www.instagram.com/y.k.j.game?igsh=aDJra3Z1ajAyMG1p'">📸 FOLLOW INSTAGRAM</button>
 
             <div style="display: flex; gap: 5px;">
@@ -502,28 +506,36 @@ function referAndEarn() {
     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
 }
 // 1. ऐड मनी (UPI Payment Link)
-function addMoney() {
+       function addMoney() {
     let amount = prompt("कितने पैसे ऐड करने हैं? (₹30 - ₹500):", "30");
+    
     if (amount >= 30 && amount <= 500) {
-        // आपकी यूपीआई आईडी का डायरेक्ट लिंक
-        let upiId = "916375843097@fam"; // यहाँ अपनी सही UPI ID चेक कर लेना
-        let name = "YKJ Game";
-        let url = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(name)}&am=${amount}&cu=INR`;
+        // आपकी सही UPI ID और नाम
+        let upiId = "916375843097@fam"; 
+        let payeeName = "Yogesh"; // यहाँ अपना असली नाम लिखें जो बैंक में है
         
-        // पेमेंट ऐप खोलना
-        window.location.href = url;
+        // शुद्ध UPI URL (बिना किसी फालतू पैरामीटर के)
+        let url = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(payeeName)}&am=${amount}&cu=INR`;
         
-        // बैकअप के लिए व्हाट्सएप (अगर UPI लिंक काम न करे)
-        setTimeout(() => {
-            if(confirm("अगर पेमेंट ऐप नहीं खुला, तो व्हाट्सएप पर मैसेज भेजें?")) {
-                window.open(`https://wa.me/916375843097?text=I_want_to_add_₹${amount}_in_my_game_ID:${userEmail}`);
-            }
-        }, 3000);
+        try {
+            // पेमेंट ऐप खोलने की कोशिश
+            window.location.href = url;
+            
+            // व्हाट्सएप बैकअप (3 सेकंड बाद)
+            setTimeout(() => {
+                if(confirm("अगर पेमेंट ऐप नहीं खुला या Error आया, तो सीधे व्हाट्सएप पर मैसेज भेजें?")) {
+                    let waMsg = `I want to add ₹${amount} in my game. My ID: ${userEmail || 'Guest'}`;
+                    window.open(`https://wa.me/916375843097?text=${encodeURIComponent(waMsg)}`);
+                }
+            }, 3500);
+            
+        } catch (err) {
+            alert("पेमेंट ऐप खोलने में दिक्कत हुई। कृपया व्हाट्सएप का उपयोग करें।");
+        }
     } else {
-        alert("कृपया ₹30 से ₹500 के बीच की राशि डालें।");
+        alert("कृपया ₹30 से ₹500 के बीच की सही राशि डालें।");
     }
 }
-
 // 2. पेड मोड चेक (यह हर वक्त चेक करेगा कि 3000 पॉइंट्स हुए या नहीं)
 setInterval(() => {
     let container = document.getElementById("paidModeContainer");
@@ -636,6 +648,232 @@ function startTournament() {
         startGame(0.34, 5, 180, 'Hard');
     }
 }
+window.manualBack = function() {
+    // 1. बटन छुपाओ
+    document.getElementById("gameOverBtnContainer").style.display = "none";
+    // 2. मेनू दिखाओ
+    hideAll(); 
+    document.getElementById("ui").style.display = "flex";
+    // 3. गेम डेटा रीसेट
+    active = false;
+    pipes = [];
+    score = 0;
+    console.log("Back to Menu Working!");
+};
+function endGame() {
+    active = false; // गेम रोकना
+    if(music) music.pause(); // म्यूजिक बंद करना
+
+    // 1. स्क्रीन पर "GAME OVER" और स्कोर दिखाना
+    ctx.fillStyle = "rgba(0,0,0,0.8)"; // बैकग्राउंड काला करना
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    ctx.fillStyle = "#ff4757"; // लाल रंग
+    ctx.font = "bold 60px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2);
+    
+    ctx.fillStyle = "white";
+    ctx.font = "25px Arial";
+    ctx.fillText("Score: " + score, canvas.width / 2, canvas.height / 2 + 50);
+
+    // 2. रिवॉर्ड और हिस्ट्री सेव करना
+    saveToHistory(score, currentMode);
+    if (isPaidMode && score >= 100) { myPoints += 15000; alert("🔥 5X WIN!"); }
+    if (isTournament && score >= 50) { myPoints += 2000; alert("🏆 TOURNAMENT WIN!"); }
+
+    isTournament = false;
+    isPaidMode = false;
+    updatePts(); // जीमेल सिंक
+
+    // 3. यहाँ है जादुई कोड: 2 सेकंड (2000ms) बाद ऑटो-बैक
+    setTimeout(() => {
+        // गेम की स्क्रीन छुपाना और मेन्यू दिखाना
+        if(document.getElementById("ui")) document.getElementById("ui").style.display = "flex";
+        if(document.getElementById("scoreDisplay")) document.getElementById("scoreDisplay").style.display = "none";
+        
+        // गेम डेटा साफ़ करना ताकि अगला मैच सही चले
+        pipes = [];
+        score = 0;
+        console.log("Auto-Returned to Menu");
+    }, 2000); 
+}
+function endGame() {
+    active = false;
+    if(music) music.pause();
+       // स्कोर को पॉइंट्स में बदलना (उदाहरण: 1 स्कोर = 1 पॉइंट)
+    if (score > 0) {
+        myPoints += score; 
+        alert("बधाई हो! आपने " + score + " पॉइंट्स कमाए।");
+    }
+    // 1. तुरंत स्क्रीन पर Game Over दिखाना
+    try {
+        ctx.fillStyle = "rgba(0,0,0,0.85)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#ff4757";
+        ctx.font = "bold 60px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2);
+        ctx.fillStyle = "white";
+        ctx.font = "22px Arial";
+        ctx.fillText("Score: " + score, canvas.width / 2, canvas.height / 2 + 50);
+    } catch(e) { console.log("Canvas Error"); }
+
+    // 2. फीचर्स को सुरक्षित तरीके से चलाना (अगर कोई एरर आया तो ये हिस्सा स्किप हो जाएगा)
+    try {
+        if (typeof saveToHistory === "function") saveToHistory(score, currentMode);
+        
+        if (isPaidMode && score >= 100) { myPoints += 15000; alert("🔥 5X WIN!"); }
+        if (isTournament && score >= 50) { myPoints += 2000; alert("🏆 TOURNAMENT WIN!"); }
+        
+        isTournament = false;
+        isPaidMode = false;
+        if (typeof updatePts === "function") updatePts();
+    } catch(e) { console.log("Features Error, but returning to menu..."); }
+
+    // 3. यह हिस्सा 100% वापस ले जाएगा (सबसे जरूरी)
+    setTimeout(function() {
+        // UI एलिमेंट्स को दिखाना/छुपाना
+        let menuUI = document.getElementById("ui");
+        let scoreUI = document.getElementById("scoreDisplay");
+        
+        if (menuUI) menuUI.style.display = "flex";
+        if (scoreUI) scoreUI.style.display = "none";
+        
+        // गेम डेटा साफ़ करना
+        pipes = [];
+        score = 0;
+        
+        console.log("Forced Return to Menu");
+    }, 2000); // 2000 मतलब 2 सेकंड
+}
+// कोई कंसोल खोलेगा तो उसे वार्निंग मिलेगी या गेम अटक जाएगा
+setInterval(function() {
+    if (window.outerHeight - window.innerHeight > 160 || window.outerWidth - window.innerWidth > 160) {
+        myPoints = 0; // हैक करने की कोशिश पर पॉइंट्स 0 कर दो
+        alert("Hacking Detected! Points Reset.");
+        location.reload();
+    }
+}, 1000);
+function updatePts() {
+    // अगर पॉइंट्स अचानक से बहुत ज्यादा बढ़ जाएं (जैसे 10,000 से ऊपर), तो उसे रिजेक्ट कर दो
+    if (myPoints > 50000) {
+        myPoints = 0;
+        alert("Invalid Points Detected!");
+    }
+    
+    if (typeof AppCreator24 !== 'undefined') {
+        AppCreator24.setVariable('points', myPoints);
+    }
+}
+// गेम लोड होते ही पुराने पॉइंट्स और हिस्ट्री खींचना
+window.onload = function() {
+    if (typeof AppCreator24 !== 'undefined') {
+        // पॉइंट्स वापस लाना
+        let savedPoints = AppCreator24.getVariable('pts');
+        if (savedPoints) myPoints = parseInt(savedPoints);
+        
+        // हिस्ट्री वापस लाना
+        let savedHistory = AppCreator24.getVariable('ykj_h');
+        if (savedHistory) localStorage.setItem('ykj_history', savedHistory);
+    }
+    updatePts(); // स्क्रीन पर स्कोर दिखाना
+};
+
+// पॉइंट्स सेव करने का पक्का फंक्शन
+function updatePts() {
+    document.getElementById('points').innerText = myPoints; // स्क्रीन अपडेट
+    if (typeof AppCreator24 !== 'undefined') {
+        AppCreator24.setVariable('pts', myPoints); // सर्वर पर सेव
+        // हिस्ट्री भी सिंक करना
+        let hData = localStorage.getItem('ykj_history');
+        if(hData) AppCreator24.setVariable('ykj_h', hData);
+    }
+}
+function updatePts() {
+    // 1. स्क्रीन पर दिखने वाले पॉइंट्स को अपडेट करें
+    let ptsElement = document.getElementById('points');
+    if (ptsElement) {
+        ptsElement.innerText = myPoints;
+    }
+
+    // 2. AppCreator24 (जीमेल सिंक) के लिए
+    if (typeof AppCreator24 !== 'undefined') {
+        AppCreator24.setVariable('pts', myPoints.toString());
+        
+        // हिस्ट्री भी सिंक करें
+        let hData = localStorage.getItem('ykj_history');
+        if(hData) AppCreator24.setVariable('ykj_h', hData);
+    }
+    
+    // 3. लोकल बैकअप (ताकि रिफ्रेश करने पर जीरो न हो)
+    localStorage.setItem('myPoints', myPoints);
+    console.log("Points Updated to: " + myPoints);
+}
+function scratchReward(win) {
+    myPoints += win;
+    updatePts(); // यह लाइन डालना मत भूलना!
+    alert("You won " + win + " Pts");
+}
+// 1. पॉइंट्स को हर जगह अपडेट करने का मास्टर फंक्शन
+function updatePts() {
+    // स्क्रीन पर जहाँ-जहाँ पॉइंट्स दिखते हैं, सब जगह अपडेट करें
+    if(document.getElementById('userPts')) document.getElementById('userPts').innerText = myPoints;
+    if(document.getElementById('totalPts')) document.getElementById('totalPts').innerText = myPoints;
+    
+    // ₹ पैसे का हिसाब (100 Pts = ₹1)
+    let cash = (myPoints / 100).toFixed(2);
+    if(document.getElementById('ptsToCash')) document.getElementById('ptsToCash').innerText = cash;
+    if(document.getElementById('cashVal')) document.getElementById('cashVal').innerText = cash;
+
+    // AppCreator24 / Gmail सिंक
+    if (typeof AppCreator24 !== 'undefined') {
+        AppCreator24.setVariable('pts', myPoints.toString());
+    }
+    
+    // लोकल बैकअप
+    localStorage.setItem('ykj_pts', myPoints);
+}
+
+// 2. 10 सीक्रेट कोड वाला फंक्शन
+function applyCode() {
+    let input = document.getElementById("promoCode").value.toUpperCase().trim();
+    let used = JSON.parse(localStorage.getItem("used_codes") || "[]");
+    let codes = ["YKJ3000", "BINA100", "RAJA33", "ANSHU77", "GAMER99", "JACKPOT1", "LUCKY10", "PROPLAY", "HACK3K", "FREE3000"];
+
+    if (used.includes(input)) return alert("कोड पहले इस्तेमाल हो चुका है!");
+    
+    if (codes.includes(input)) {
+        myPoints += 3000;
+        used.push(input);
+        localStorage.setItem("used_codes", JSON.stringify(used));
+        updatePts(); // तुरंत स्क्रीन अपडेट होगी
+        alert("सफलता! 3000 Pts मिल गए।");
+        document.getElementById("promoCode").value = "";
+    } else {
+        alert("गलत कोड!");
+    }
+}
+
+// 3. गेम लोड होते ही पुराने पॉइंट्स वापस लाना
+window.addEventListener('load', function() {
+    let localSaved = localStorage.getItem('ykj_pts');
+    if (localSaved !== null) myPoints = parseInt(localSaved);
+    
+    // AppCreator24 से सिंक
+    if (typeof AppCreator24 !== 'undefined') {
+        let cloudPts = AppCreator24.getVariable('pts');
+        if (cloudPts) myPoints = parseInt(cloudPts);
+    }
+    updatePts();
+});
+function savePoints(user, points){
+  db.collection("users").doc(user.uid).set({
+    email: user.email,
+    points: points
+  });
+}
+
     </script>
 </body>
 </html>
