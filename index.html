@@ -63,12 +63,10 @@
     <button class="btn" style="background: gold; color: black; padding: 5px;" onclick="applyCode()">APPLY PROMO</button>
 </div>
             <button class="btn" style="background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #bc1888); color: white;" onclick="window.location.href='https://www.instagram.com/y.k.j.game2?igsh=ODdpa3E4aTFvd2Yx'">📸 FOLLOW INSTAGRAM</button>
-
             <div style="display: flex; gap: 5px;">
                 <button class="btn" style="background: white; flex: 1;" onclick="showWallet()">WALLET</button>
                 <button class="btn" style="background: #555; color: white; flex: 1;" onclick="showHistory()">HISTORY</button>
             </div>
-
             <select id="songSelect" style="width:100%; margin-top:10px; background:#222; color:gold; border:1px solid gold;" onchange="changeSong()">
                 <option value="scam.mp3">🎵 Track 01</option>
                 <option value="song2.mp3">🎵 Track 02</option>
@@ -90,11 +88,10 @@
                     </option>
                 
             </select>
+              <div id="paidModeContainer" style="display: none;">
+    <button class="btn" style="background: gold; color: black; font-weight: bold; border: 2px solid #000;" onclick="startPaidMode()">🔥 ULTRA PAID MODE (Entry: 3000)</button>
         </div>
     </div>
-    
-<div id="paidModeContainer" style="display: none;">
-    <button class="btn" style="background: gold; color: black; font-weight: bold; border: 2px solid #000;" onclick="startPaidMode()">🔥 ULTRA PAID MODE (Entry: 3000)</button>
 </div>
     <div id="scratchUI">
         <div class="box">
@@ -110,6 +107,17 @@
             <h2 style="color: gold;">ITEM SHOP</h2>
             <button class="btn" style="background:#3498db; color:white;" onclick="buyItem('blue', 500)">Blue Bird (500 Pts)</button>
             <button class="btn" style="background:#e67e22; color:white;" onclick="buyItem('pipe', 1000)">Red Pipes (1000 Pts)</button>
+            <button onclick="buyItem('bird1', 200)">Bird Yellow (200)</button>
+<button onclick="buyItem('bird2', 500)">Bird Blue (500)</button>
+<button onclick="buyItem('bird3', 1000)">Bird Red (1000)</button>
+<button onclick="buyItem('bird4', 2000)">Bird Neon (2000)</button>
+<button onclick="buyItem('bird5', 5000)">Bird King (5000)</button>
+
+<button onclick="buyItem('pipe1', 200)">Pipe Green</button>
+<button onclick="buyItem('pipe2', 500)">Pipe Red</button>
+<button onclick="buyItem('pipe3', 1000)">Pipe Gold</button>
+<button onclick="buyItem('pipe4', 2000)">Pipe Neon</button>
+<button onclick="buyItem('pipe5', 5000)">Pipe Fire</button>
             <button class="btn" style="background:white;" onclick="hideAll()">BACK</button>
         </div>
     </div>
@@ -120,7 +128,7 @@
             <p style="font-size:12px;">100 Pts = ₹1 | 1000 Pts = ₹10</p>
             <p>Total Pts: <span id="totalPts">0</span> (₹<span id="cashVal">0</span>)</p>
             <input type="text" id="upiInput" placeholder="Enter UPI ID">
-            <button class="btn" style="background: #2ecc71;" onclick="sendWithdrawRequest()">WITHDRAW NOW</button>
+            <button class="btn" style="background: #2ecc71;" onclick="sendWithdrawRequest()">WITHDRAW NOW💵💸✅</button>
             <button class="btn" style="background: white;" onclick="hideAll()">BACK</button>
             <button class="btn" style="background: #6c5ce7; color: white;" onclick="referAndEarn()">📢 REFER & EARN (+500 Pts)</button>
         </div>
@@ -191,16 +199,6 @@
             let hr = new Date().getHours();
             document.getElementById("tournamentBox").style.display = (hr === 18) ? "block" : "none";
         }, 1000);
-        // 7. स्पिन वर्किंग
-function spinNow() {
-    if(myPoints < 10) return alert("10 Pts needed!");
-    myPoints -= 10; updatePts();
-    let d = Math.floor(Math.random() * 360) + 1800;
-    document.getElementById("wheel").style.transform = `rotate(${d}deg)`;
-    setTimeout(() => { let w = [10, 50, 0, 100][Math.floor(Math.random()*4)]; myPoints += w; updatePts(); alert("Won: "+w); }, 4000);
-}
-
-
         // --- स्क्रैच कार्ड (वर्किंग डेवलप कोड) ---
         function initScratch() {
             const sc = document.getElementById("scratchCanvas");
@@ -222,27 +220,12 @@ function spinNow() {
                 }
             };
         }
-
-    
-        // --- गेम कोर ---
+                // --- गेम कोर ---
         function startGame(g, s, gp, mode) {
             grav = g; speed = s; gap = gp; active = true; score = 0; birdY = canvas.height/2; birdV = 0; pipes = []; frame = 0; lifeUsed = false;
             document.getElementById("ui").style.display = "none"; document.getElementById("scoreDisplay").style.display = "block";
             alert("WELCOME TO Y.K.J. GAME, " + userName + "!");
             music.play().catch(e => {}); loop();
-        }
-
-        function endGame() {
-        if(!lifeUsed && score > 2) {
-                if(confirm("Use 50 Pts for Extra Life?")) {
-                    myPoints -= 50; updatePts(); lifeUsed = true; birdY = canvas.height/2; birdV = 0; return;
-                }
-            }
-            active = false; music.pause();
-            let earned = (score >= 150) ? 50 : (score >= 90) ? 30 : (score >= 30) ? 15 : (score >= 10) ? 5 : 0;
-            if(score >= 10) { try { new Audio('https://www.soundjay.com/buttons/sounds/button-10.mp3').play(); } catch(e){} }
-            myPoints += earned; updatePts();
-            document.getElementById("ui").style.display = "flex"; document.getElementById("scoreDisplay").style.display = "none";
         }
         function spinNow() {
     // आज की तारीख और स्पिन की गिनती चेक करना
@@ -289,7 +272,6 @@ function spinNow() {
         alert(`🎁 बधाई हो! आपने ${win} Pts जीते। (आज के स्पिन: ${spinData.count}/2)`);
     }, 4500);
 }
-
         function loop() {
             if(!active) return;
             ctx.fillStyle = "black"; ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -306,7 +288,8 @@ function spinNow() {
             }
 
             for(var i=pipes.length-1; i>=0; i--) {
-                var p = pipes[i]; p.x -= speed; ctx.fillStyle = pipeColor;
+                var p = pipes[i]; p.x -= speed; 
+                ctx.fillStyle = pipeColor;
                 ctx.fillRect(p.x, 0, 65, p.t); ctx.fillRect(p.x, p.t + gap, 65, canvas.height);
                 if(!p.p && p.x + 65 < birdX) { score++; p.p = true; document.getElementById("scoreDisplay").innerText = score; }
                 if(birdX+15 > p.x && birdX-15 < p.x+65 && (birdY-15 < p.t || birdY+15 > p.t+gap)) endGame();
@@ -322,7 +305,7 @@ function spinNow() {
     ctx.rotate(birdV * 0.04); // गिरने या ऊपर जाने के हिसाब से चिड़िया झुकेगी
 
     // 1. चिड़िया का शरीर (Main Body)
-    ctx.fillStyle = "#f1c40f"; 
+    ctx.fillStyle = birdColor;
     ctx.beginPath();
     ctx.ellipse(0, 0, 22, 18, 0, 0, Math.PI * 2);
     ctx.fill();
@@ -330,7 +313,7 @@ function spinNow() {
     // 2. चिड़िया के पंख (Animated Wings) - यहाँ नया बदलाव है
     // Math.sin का इस्तेमाल किया है ताकि पंख ऊपर-नीचे फड़फड़ाएं
     var wingFlap = Math.sin(frame * 0.3) * 12; 
-    ctx.fillStyle = "#ffd700"; // थोड़ा गहरा पीला रंग पंखों के लिए
+    ctx.fillStyle = ""; // थोड़ा गहरा पीला रंग पंखों के लिए
     ctx.beginPath();
     // पंख की पोजीशन और मूवमेंट
     ctx.ellipse(-12, wingFlap, 15, 10, Math.PI / 4, 0, Math.PI * 2);
@@ -365,20 +348,7 @@ function spinNow() {
     ctx.font = "bold 14px Arial";
     ctx.textAlign = "center";
     ctx.fillText(userName, x, y - 35);
-}
-
-
-        function updatePts()
-{
-            localStorage.setItem("ykj_pts", myPoints);
-            document.getElementById("userPts").innerText = myPoints;
-            document.getElementById("totalPts").innerText = myPoints;
-            let cash = (myPoints / 100).toFixed(2);
-            document.getElementById("ptsToCash").innerText = cash;
-            document.getElementById("cashVal").innerText = cash;
-            if (typeof AppCreator24 !== 'undefined') AppCreator24.setVariable('points', myPoints);
         }
-
         function showScratch() { hideAll(); document.getElementById("scratchUI").style.display="flex"; initScratch(); }
         function showShop() { hideAll(); document.getElementById("shopUI").style.display="flex"; }
         function buyItem(type, price) {
@@ -408,7 +378,6 @@ function spinNow() {
         function showTask() { hideAll(); document.getElementById("taskUI").style.display="flex"; }
         function showSpin() { hideAll(); document.getElementById("spinUI").style.display="flex"; }
         function changeSong() { document.getElementById("musicSource").src = document.getElementById("songSelect").value; music.load(); music.play(); }
-
         window.onmousedown = function() { if(active) birdV = -7; }; window.ontouchstart = function(e) { if(active) { birdV = -7; e.preventDefault(); } };
         /* --- Y.K.J. MASTER FEATURES START --- */
 var isTournament = false, isPaidMode = false, currentMode = "Easy";
@@ -470,7 +439,7 @@ function referAndEarn() {
     
     if (amount >= 30 && amount <= 500) {
         // आपकी सही UPI ID और नाम
-        let upiId = "916375843097@fam"; 
+        let upiId = "6375843097@fam"; 
         let payeeName = "Yogesh"; // यहाँ अपना असली नाम लिखें जो बैंक में है
         
         // शुद्ध UPI URL (बिना किसी फालतू पैरामीटर के)
@@ -519,94 +488,6 @@ function startPaidMode() {
         startGame(0.45, 7, 140, 'Ultra'); 
     }
 }
-function endGame() {
-    active = false;
-    
-    if (isPaidMode) {
-        if (score >= 100) {
-            let winAmount = 15000; // 3000 का 5 गुना
-            myPoints += winAmount;
-            alert(`🔥 तगड़ी जीत! आपने 100+ स्कोर बनाया और 15000 Pts जीते!`);
-        } else {
-            alert("ओह! स्कोर 100 से कम रह गया। आपके 3000 Pts कट गए।");
-            // पॉइंट्स पहले ही कट चुके हैं, इसलिए यहाँ कुछ जोड़ने की जरूरत नहीं
-        }
-        isPaidMode = false; // पेड मोड खत्म
-    }
-    
-    updatePts(); // जीमेल पर सिंक करना
-    // ... बाकी का पुराना endGame कोड ...
-}
-function endGame() {
-    active = false;
-    if(music) music.pause();
-
-    // --- गेम ओवर स्क्रीन (बड़े अक्षरों में) ---
-    ctx.fillStyle = "rgba(0,0,0,0.7)"; // हल्का काला बैकग्राउंड
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    ctx.fillStyle = "#ff4757"; // लाल रंग
-    ctx.font = "bold 60px Arial";
-    ctx.textAlign = "center";
-    ctx.shadowBlur = 20;
-    ctx.shadowColor = "red";
-    ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2);
-    
-    ctx.shadowBlur = 0; // शैडो हटाना
-    ctx.fillStyle = "white";
-    ctx.font = "25px Arial";
-    ctx.fillText("Final Score: " + score, canvas.width / 2, canvas.height / 2 + 60);
-    // ---------------------------------------
-
-    // रिवॉर्ड चेक (टूर्नामेंट और पेड मोड के लिए)
-    if (isTournament && score >= 50) {
-        let p = (score >= 100) ? 2000 : (score >= 70) ? 1000 : 500;
-        myPoints += p;
-        alert("🏆 टूर्नामेंट प्राइज: " + p + " Pts!");
-    }
-
-    if (isPaidMode && score >= 100) {
-        myPoints += 15000;
-        alert("🔥 5X JACKPOT WIN!");
-    }
-
-    // हिस्ट्री सेव करना
-    saveToHistory(score, currentMode);
-    
-    isTournament = false;
-    isPaidMode = false;
-    updatePts();
-
-    // 2 सेकंड बाद वापस मेनू पर ले जाना
-    setTimeout(() => {
-        document.getElementById("ui").style.display = "flex";
-        document.getElementById("scoreDisplay").style.display = "none";
-    }, 2500);
-}
-// टूर्नामेंट फंक्शन (शाम 6 से 7 बजे के लिए)
-function startTournament() {
-    let hr = new Date().getHours();
-    
-    // समय की पाबंदी (6 PM = 18)
-    if (hr !== 18) {
-        alert("अभी टूर्नामेंट का समय नहीं हुआ है! शाम 6:00 से 7:00 के बीच आएं।");
-        return;
-    }
-
-    if (myPoints < 500) {
-        alert("टूर्नामेंट के लिए 500 Pts एंट्री फीस चाहिए!");
-        return;
-    }
-
-    if (confirm("टूर्नामेंट जॉइन करें?\nफीस: 500 Pts\nचैलेंज: 50+ स्कोर बनाना है!")) {
-        myPoints -= 500;
-        updatePts();
-        isTournament = true;
-        currentMode = "Tournament";
-        // टूर्नामेंट हार्ड मोड में चलेगा (Gravity: 0.34, Speed: 5)
-        startGame(0.34, 5, 180, 'Hard');
-    }
-}
 window.manualBack = function() {
     // 1. बटन छुपाओ
     document.getElementById("gameOverBtnContainer").style.display = "none";
@@ -620,45 +501,8 @@ window.manualBack = function() {
     console.log("Back to Menu Working!");
 };
 function endGame() {
-    active = false; // गेम रोकना
-    if(music) music.pause(); // म्यूजिक बंद करना
-
-    // 1. स्क्रीन पर "GAME OVER" और स्कोर दिखाना
-    ctx.fillStyle = "rgba(0,0,0,0.8)"; // बैकग्राउंड काला करना
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-    ctx.fillStyle = "#ff4757"; // लाल रंग
-    ctx.font = "bold 60px Arial";
-    ctx.textAlign = "center";
-    ctx.fillText("GAME OVER", canvas.width / 2, canvas.height / 2);
-    
-    ctx.fillStyle = "white";
-    ctx.font = "25px Arial";
-    ctx.fillText("Score: " + score, canvas.width / 2, canvas.height / 2 + 50);
-
-    // 2. रिवॉर्ड और हिस्ट्री सेव करना
-    saveToHistory(score, currentMode);
-    if (isPaidMode && score >= 100) { myPoints += 15000; alert("🔥 5X WIN!"); }
-    if (isTournament && score >= 50) { myPoints += 2000; alert("🏆 TOURNAMENT WIN!"); }
-
-    isTournament = false;
-    isPaidMode = false;
-    updatePts(); // जीमेल सिंक
-
-    // 3. यहाँ है जादुई कोड: 2 सेकंड (2000ms) बाद ऑटो-बैक
-    setTimeout(() => {
-        // गेम की स्क्रीन छुपाना और मेन्यू दिखाना
-        if(document.getElementById("ui")) document.getElementById("ui").style.display = "flex";
-        if(document.getElementById("scoreDisplay")) document.getElementById("scoreDisplay").style.display = "none";
-        
-        // गेम डेटा साफ़ करना ताकि अगला मैच सही चले
-        pipes = [];
-        score = 0;
-        console.log("Auto-Returned to Menu");
-    }, 2000); 
-}
-function endGame() {
     active = false;
+    saveToHistory(score, currentMode);
     if(music) music.pause();
        // स्कोर को पॉइंट्स में बदलना (उदाहरण: 1 स्कोर = 1 पॉइंट)
     if (score > 0) {
@@ -677,7 +521,6 @@ function endGame() {
         ctx.font = "22px Arial";
         ctx.fillText("Score: " + score, canvas.width / 2, canvas.height / 2 + 50);
     } catch(e) { console.log("Canvas Error"); }
-
     // 2. फीचर्स को सुरक्षित तरीके से चलाना (अगर कोई एरर आया तो ये हिस्सा स्किप हो जाएगा)
     try {
         if (typeof saveToHistory === "function") saveToHistory(score, currentMode);
@@ -704,7 +547,7 @@ function endGame() {
         score = 0;
         
         console.log("Forced Return to Menu");
-    }, 2000); // 2000 मतलब 2 सेकंड
+    }, 1000); // 1000 मतलब 1 सेकंड
 }
 // कोई कंसोल खोलेगा तो उसे वार्निंग मिलेगी या गेम अटक जाएगा
 setInterval(function() {
@@ -715,7 +558,10 @@ setInterval(function() {
     }
 }, 1000);
 function updatePts() {
-    // अगर पॉइंट्स अचानक से बहुत ज्यादा बढ़ जाएं (जैसे 10,000 से ऊपर), तो उसे रिजेक्ट कर दो
+    // स्क्रीन पर जहाँ-जहाँ पॉइंट्स दिखते हैं, सब जगह अपडेट करें
+    if(document.getElementById('userPts')) document.getElementById('userPts').innerText = myPoints;
+    if(document.getElementById('totalPts')) document.getElementById('totalPts').innerText = myPoints;
+        // अगर पॉइंट्स अचानक से बहुत ज्यादा बढ़ जाएं (जैसे 10,000 से ऊपर), तो उसे रिजेक्ट कर दो
     if (myPoints > 50000) {
         myPoints = 0;
         alert("Invalid Points Detected!");
@@ -724,62 +570,6 @@ function updatePts() {
     if (typeof AppCreator24 !== 'undefined') {
         AppCreator24.setVariable('points', myPoints);
     }
-}
-// गेम लोड होते ही पुराने पॉइंट्स और हिस्ट्री खींचना
-window.onload = function() {
-    if (typeof AppCreator24 !== 'undefined') {
-        // पॉइंट्स वापस लाना
-        let savedPoints = AppCreator24.getVariable('pts');
-        if (savedPoints) myPoints = parseInt(savedPoints);
-        
-        // हिस्ट्री वापस लाना
-        let savedHistory = AppCreator24.getVariable('ykj_h');
-        if (savedHistory) localStorage.setItem('ykj_history', savedHistory);
-    }
-    updatePts(); // स्क्रीन पर स्कोर दिखाना
-};
-
-// पॉइंट्स सेव करने का पक्का फंक्शन
-function updatePts() {
-    document.getElementById('points').innerText = myPoints; // स्क्रीन अपडेट
-    if (typeof AppCreator24 !== 'undefined') {
-        AppCreator24.setVariable('pts', myPoints); // सर्वर पर सेव
-        // हिस्ट्री भी सिंक करना
-        let hData = localStorage.getItem('ykj_history');
-        if(hData) AppCreator24.setVariable('ykj_h', hData);
-    }
-}
-function updatePts() {
-    // 1. स्क्रीन पर दिखने वाले पॉइंट्स को अपडेट करें
-    let ptsElement = document.getElementById('points');
-    if (ptsElement) {
-        ptsElement.innerText = myPoints;
-    }
-
-    // 2. AppCreator24 (जीमेल सिंक) के लिए
-    if (typeof AppCreator24 !== 'undefined') {
-        AppCreator24.setVariable('pts', myPoints.toString());
-        
-        // हिस्ट्री भी सिंक करें
-        let hData = localStorage.getItem('ykj_history');
-        if(hData) AppCreator24.setVariable('ykj_h', hData);
-    }
-    
-    // 3. लोकल बैकअप (ताकि रिफ्रेश करने पर जीरो न हो)
-    localStorage.setItem('myPoints', myPoints);
-    console.log("Points Updated to: " + myPoints);
-}
-function scratchReward(win) {
-    myPoints += win;
-    updatePts(); // यह लाइन डालना मत भूलना!
-    alert("You won " + win + " Pts");
-}
-// 1. पॉइंट्स को हर जगह अपडेट करने का मास्टर फंक्शन
-function updatePts() {
-    // स्क्रीन पर जहाँ-जहाँ पॉइंट्स दिखते हैं, सब जगह अपडेट करें
-    if(document.getElementById('userPts')) document.getElementById('userPts').innerText = myPoints;
-    if(document.getElementById('totalPts')) document.getElementById('totalPts').innerText = myPoints;
-    
     // ₹ पैसे का हिसाब (100 Pts = ₹1)
     let cash = (myPoints / 100).toFixed(2);
     if(document.getElementById('ptsToCash')) document.getElementById('ptsToCash').innerText = cash;
@@ -798,7 +588,7 @@ function updatePts() {
 function applyCode() {
     let input = document.getElementById("promoCode").value.toUpperCase().trim();
     let used = JSON.parse(localStorage.getItem("used_codes") || "[]");
-    let codes = ["YKJ3000", "BINA100", "RAJA33", "ANSHU77", "GAMER99", "JACKPOT1", "LUCKY10", "PROPLAY", "HACK3K", "FREE3000"];
+    let codes = ["YKJ3000", "BINA100", "RAJA33", "ANSHU77", "GAMER99", "YKJAAT", "JAATJAAT1", "KALERA12", "JATBOY12", "PAPABOLPAPA", "JACKPOT1", "LUCKY10", "PROPLAY", "HACK3K", "FREE3000"];
 
     if (used.includes(input)) return alert("कोड पहले इस्तेमाल हो चुका है!");
     
@@ -840,6 +630,115 @@ function claimTelegramReward() {
         localStorage.setItem('tg_joined', 'true');
         updatePts();
         alert("Telegram Join Reward: 100 Pts Added!");
+    }
+}
+function showHistory() {
+    let history = JSON.parse(localStorage.getItem('game_history')) || [];
+
+    if (history.length === 0) {
+        alert("WELCOME TO HISTORY!");
+        return;
+    }    let text = "Last 10 Games:\n\n";
+    history.forEach((h, i) => {
+        text += `${i+1}. Score: ${h.score} | ${h.date}\n`;
+    });
+
+    alert(text);
+}
+function updatePts() {
+    document.getElementById('userPts').innerText = myPoints;
+    document.getElementById('totalPts').innerText = myPoints;
+
+    let cash = (myPoints / 100).toFixed(2);
+    document.getElementById('ptsToCash').innerText = cash;
+    document.getElementById('cashVal').innerText = cash;
+
+    // 🔥 CLOUD SAVE (IMPORTANT)
+    if (typeof AppCreator24 !== 'undefined') {
+        AppCreator24.setVariable('points', myPoints.toString());
+    }
+
+    // Local backup
+    localStorage.setItem('ykj_pts', myPoints);
+}
+window.addEventListener('load', function() {
+  loadItems();
+    let localSaved = localStorage.getItem('ykj_pts');
+    if (localSaved !== null) myPoints = parseInt(localSaved);
+
+    // 🔥 Cloud से load
+    if (typeof AppCreator24 !== 'undefined') {
+        let cloudPts = AppCreator24.getVariable('points');
+        if (cloudPts) myPoints = parseInt(cloudPts);
+    }
+
+    updatePts();
+});
+function saveToHistory(score, mode) {
+    let history = JSON.parse(localStorage.getItem('game_history')) || [];
+
+    history.unshift({
+        score: score,
+        mode: mode,
+        date: new Date().toLocaleString()
+    });
+
+    if (history.length > 100) history.pop();
+
+    localStorage.setItem('game_history', JSON.stringify(history));
+}
+// ===== ITEM SYSTEM START =====
+let birdSkins = {
+    bird1: "#f1c40f",
+    bird2: "#3498db",
+    bird3: "#e74c3c",
+    bird4: "#00ffcc",
+    bird5: "#9b59b6"
+};
+let pipeSkins = {
+    pipe1: "#2ecc71",
+    pipe2: "#e74c3c",
+    pipe3: "#f1c40f",
+    pipe4: "#00ffff",
+    pipe5: "#ff8800"
+};
+// BUY ITEM
+function buyItem(type, price){if (localStorage.getItem("owned_" + type)) {
+    applyItem(type);
+    alert("Already owned, applied!");
+    return;
+}
+    if (myPoints < price) {
+        alert("Not enough points!");
+        return;
+    }
+    myPoints -= price;
+    // Save purchase
+    localStorage.setItem("owned_" + type, "true");
+    // Apply instantly
+    applyItem(type);
+    updatePts();
+    alert("✅ Item Purchased & Applied!");}
+// APPLY ITEM
+function applyItem(type) {
+    if (birdSkins[type]) {
+        birdColor = birdSkins[type];
+        localStorage.setItem("selected_bird", type);
+    }
+    if (pipeSkins[type]) {
+        pipeColor = pipeSkins[type];
+        localStorage.setItem("selected_pipe", type);
+    }
+}
+// LOAD SAVED ITEMS (auto apply)
+function loadItems() {
+    let savedBird = localStorage.getItem("selected_bird");
+    let savedPipe = localStorage.getItem("selected_pipe");
+    if (savedBird && birdSkins[savedBird]) {
+        birdColor = birdSkins[savedBird];
+    }
+    if (savedPipe && pipeSkins[savedPipe]) {
+        pipeColor = pipeSkins[savedPipe];
     }
 }
     </script>
