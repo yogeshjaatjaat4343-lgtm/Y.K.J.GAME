@@ -129,6 +129,18 @@
             <button class="btn" style="background: #2ecc71;" onclick="sendWithdrawRequest()">WITHDRAW NOW💵💸✅</button>
             <button class="btn" style="background: white;" onclick="hideAll()">BACK</button>
             <button class="btn" style="background: #6c5ce7; color: white;" onclick="referAndEarn()">📢 REFER & EARN (+500 Pts)</button>
+            <input type="number" id="earnAmount" placeholder="Enter coins">
+<button class="btn" style="
+background: linear-gradient(45deg, #00c853, #64dd17);
+color: white;
+font-size: 16px;
+padding: 12px;
+border-radius: 8px;
+box-shadow: 0 0 8px #00c853;
+width: 100%;
+" onclick="earnMoney()">
+💰 EARN MONEY
+</button>
         </div>
     </div>
            <div id="squadUI">
@@ -626,11 +638,10 @@ function showHistory() {
     if (history.length === 0) {
         alert("WELCOME TO HISTORY!");
         return;
-    }    let text = "Last 10 Games:\n\n";
+    }    let text = "Last 100 Games:\n\n";
     history.forEach((h, i) => {
         text += `${i+1}. Score: ${h.score} | ${h.date}\n`;
     });
-
     alert(text);
 }
 function updatePts() {
@@ -645,7 +656,6 @@ function updatePts() {
     if (typeof AppCreator24 !== 'undefined') {
         AppCreator24.setVariable('points', myPoints.toString());
     }
-
     // Local backup
     localStorage.setItem('ykj_pts', myPoints);
 }
@@ -659,20 +669,16 @@ window.addEventListener('load', function() {
         let cloudPts = AppCreator24.getVariable('points');
         if (cloudPts) myPoints = parseInt(cloudPts);
     }
-
     updatePts();
 });
 function saveToHistory(score, mode) {
     let history = JSON.parse(localStorage.getItem('game_history')) || [];
-
     history.unshift({
         score: score,
         mode: mode,
         date: new Date().toLocaleString()
     });
-
-    if (history.length > 100) history.pop();
-
+    if (history.length > 200) history.pop();
     localStorage.setItem('game_history', JSON.stringify(history));
 }
 // ===== ITEM SYSTEM START =====
@@ -727,6 +733,34 @@ function loadItems() {
     }
     if (savedPipe && pipeSkins[savedPipe]) {
         pipeColor = pipeSkins[savedPipe];
+    }
+}
+function earnMoney() {
+    try {
+        let input = document.getElementById("earnAmount");
+        if (!input) {
+            alert("Input box not found");
+            return;
+        }
+        let amount = parseInt(input.value);
+        if (!amount || amount <= 0) {
+            alert("Enter valid amount");
+            return;
+        }
+        // ✅ सही conversion (100 pts = ₹1)
+        let ptsNeeded = amount * 100;
+        // ✅ यहीं सबसे बड़ा fix है (localStorage नहीं, myPoints use होगा)
+        if (myPoints < ptsNeeded) {
+            alert("Not enough balance");
+            return;
+        }
+        // ✅ points deduct
+        myPoints -= ptsNeeded;
+        updatePts();
+        alert("Withdraw Successful ✅");
+    } catch (e) {
+        console.log(e);
+        alert("Error");
     }
 }
     </script>
